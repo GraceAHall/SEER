@@ -1,0 +1,248 @@
+
+------------
+--- TODO ---
+------------
+
+- Data access   [✔]
+- Data cleaning [✔] 
+- Data exploration [-] (doing)
+- Model fitting [-] (doing)
+- Add age, ethnicity, gender 
+- Breast: PCA clustering
+    - stage
+    - grade
+    - molecular sybtypes
+- Decision tree for breast with TSTAGE, NSTAGE, GRADE, molecular subtype (hist_type)
+- odds ratios GSTAGE_STD Lung vs Prostate
+- odds ratios GRADE Lung vs Prostate
+
+Questions 
+- Does the current common vs uncommon distinction apply? 
+- Is there something unique about cancers which metastasize to brain vs other regions? 
+- What is the relationship between locoregional lymph node spread & mets? local nodes, distant LN, mets
+- 
+
+
+- Is there a data-driven definition of common vs uncommon?
+- Risk 
+    - single variable 
+    - multiple variables 
+        - TSTAGE=1; NSTAGE=1vs2
+        - TSTAGE=2; NSTAGE=1vs2
+        - TSTAGE=3; NSTAGE=1vs2
+        - TSTAGE=4; NSTAGE=1vs2
+Do brain mets develop differently for these categories?
+What features predict BM?
+Primary site, common, t_stage, n_stage, hist_type, etc
+Is common vs uncommon a useful distinction? 
+
+- INCIDENCE 
+    - priamry_site
+    - incidence rate ratios rather than odds ratios 
+    - Survival curves (but brain met)
+
+Sites 
+- assumed_primary (for a given brain met)
+- Breast: 2 categories.
+    - low stage, low grade: low probability of metastasis in general 
+    - molecular subtypes for breast cancer determine aggressiveness (TNBC=most lethal/aggressive, HER2 etc)
+- check placenta C589 "other female..."
+
+Contrasts 
+- do everything with site_category
+- lung vs rest 
+    - lung is super different from everything? 
+- historical 'common' vs rest           [lung, breast, renal, skin, colorectal]
+- data-driven 'common' vs rest          [lung, esophagus, renal, testis] (above 1% prev)
+- data-driven 'uncommon' vs rest        [prostate, leukemia]
+- data-driven 'common' vs data-driven 'uncommon'
+
+- single vs multisite
+    - do odds ratios etc for sinlges 
+    - add last tumor for multis 
+    - do they differ? 
+
+AJCC stage group 
+- don't mix c & p 
+- c = clinical 
+- p = pathological
+
+
+---------------
+--- RESULTS ---
+---------------
+
+--- BREAST ---
+
+GSTAGE_STD vs BRAIN_MET (763723 records) ---
+GSTAGE_STD       0       I      II    III     IV
+BRAIN_MET                                       
+NO          136213  324134  162665  55311  33873
+YES              0       0       0      0   2738
+
+Mutual Information (normalized): 0.017
+
+
+
+---------------------------------
+--- SEER PROSTATE / COMBIMETS ---
+---------------------------------
+
+PSA 
+- only produced in prostate
+- if detected in blood == you have a prostate. 
+- if prostate removed && you still have PSA, you have met / circulating tumor cells 
+    - PSA reading == 0.01-0.2: 10% will have a met
+    - PSA reading == 0.2-0.1:  50% will have a met
+
+
+-------------------
+--- BASIC STATS ---
+-------------------
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8198228/#:~:text=However%2C%20in%20studies%20comparing%20the,risk%20for%20risk%20ratios%20less
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4640017/#:~:text=The%20relative%20risk%20(also%20known,event%20in%20the%20other%20group.
+https://sphweb.bumc.bu.edu/otlt/mph-modules/ep/ep713_association/ep713_association3.html#:~:text=Rate%20ratios%20are%20closely%20related,or%20less%20exposed)%20comparison%20group.
+
+RESEARCH QUESTIONS
+- Prostate doesn't go to brain cuz slow growing?
+- Is there a data-driven definition of common|uncommon BM primaries? adjust for:
+    - cancer growth rate 
+    - how 'early' a cancer is detected (community screening/checkups)?
+- What features (t_stage; n_stage; t_stage+n_stage; hist_type) predict BM? 
+
+IMPORTANT
+- conditional probabilities / or normalization absolutely required. 
+    - OK?:  Odds ratio LUNG G1 vs G2 cuz single variable tested.
+    - OK?:  Mutual Information ALL_SITES G1 vs G2 cuz single variable tested.
+    - BAD:  Odds ratio LUNG_G1 vs PROSTATE_G1 cuz 2 variables (primary; stage)
+- multivariate statistics probably best 
+    - JUST OK: T_STAGE alone to predict BM. 
+    - BETTER: A combination of T_STAGE and N_STAGE.
+
+Main items
+- prevalence (period prev 2010-2020)
+- incidence (non-bm patients who later developed a bm)
+- Do grade again, but comparison is odds ratio (common&T1 vs uncommon &T1) etc
+- mutual information (MI)
+- conditional mutual information (CMI)
+- multivariate information (MVI) theory 
+- decision tree 
+
+
+Prevalence: 
+- the proportion of all people in the study population who have the outcome of interest (e.g., disease or condition) at a particular time
+- # people affected / # people in study 
+- X cases per Y people
+- eg 
+    # people in study = 10,000
+    # diabetes = 1,000
+    prevalence = 1,000 / 10,000 
+        or 100 cases per 1,000 people
+        or 10 cases per 100 people 
+        or 1 in 10
+- point prevalence: prevalence at single point in time (eg "as of 2020")
+- period prevalence: prevalence within a time range (eg 2010-2015)
+
+Incidence:
+- different to prevalence
+- the proportion of at-risk subjects who develop the outcome of interest
+- incidence proportion: probability of developing BM before 2020 among all subjects at risk
+- incidence rate:       frequency per time per person (eg 11.1 new cases of BM per year per 1000 ppl)  
+- eg 
+    10,000 subjects
+    1,000 already have diabetes 
+    9,000 at risk
+    5 year observation period, 500 new cases by end 
+
+    incidence proportion (cumulative incidence):
+    500/9000 or 55.5 cases per 1000 or 5.6%
+    
+    incidence rate:
+    total person years = 9000 * 5 = 45,000
+    500/45,000 = 11.1 cases per 1000 ppl per year 
+
+incidence rate ratio (IRRs)
+- need at least 2 time points
+- https://ehp.niehs.nih.gov/doi/full/10.1289/EHP7246
+- https://www.ncbi.nlm.nih.gov/books/NBK555593/figure/ch5.fig2/
+- incidence rate per primary = x per 10000 cases 
+- split into 
+    - primary type
+    - common/uncommon
+    - T/N stage 
+    - Group stage 
+    - Grade
+- ratios can then be calculated 
+    - common vs common 
+    - breast vs prostate
+    - Grade.G2 vs Grade.G1 etc 
+- p-value? CI? does this need group mean test?
+- eg 
+    HRT     # with disease  
+    YES     30
+    NO      60
+
+
+Risk
+- "the probability that an outcome will occur"
+- need at least 2 time points
+- risk ratio = relative risk = RR
+- joint/marginal probabilities
+- risk of BM = has_bm/no_bm (entire dataset)
+                YES_BM  NO_BM   Grade Margin
+    Grade.G2         a      b            a+b
+    Grade.G1         c      d            c+d
+    BM Margin      a+c    b+d
+
+- risk Grade.G2 G2 = a/a+b
+- risk Grade.G1 G1 = c/c+d
+- risk ratio  (G2) = G2 / G1
+- excess risk (G2) = G2 - G1   (attributable risk)
+- p-value? 
+
+odds ratio 
+- a single point in time 
+- https://www.researchgate.net/figure/Odds-ratio-OR-and-95-confidence-interval-CI-per-increment-of-1-standard-deviation-of_fig2_292071941
+- same as RR but odds 
+- odds "the probability that an event occurs divided by the probability that the event does not occur"
+
+Hazard ratio
+- https://www.ncbi.nlm.nih.gov/pmc/articles/PMC478551/
+- cox proportional hazards model
+- survival analysis
+- Students t-test (para) or Wilcoxon rank-sum test (non-para)?
+- comparing two groups
+- similar to IRRs 
+"Hazard ratios differ from relative risks (RRs) and odds ratios (ORs) in that RRs and ORs are cumulative over an entire study, using a defined endpoint, while HRs represent instantaneous risk over the study time period, or some subset thereof. Hazard ratios suffer somewhat less from selection bias with respect to the endpoints chosen and can indicate risks that happen before the endpoint."
+
+Mutual information 
+- measures patterns of change for categorical variables
+- if we want continuous variables
+    - create histogram  
+    - use each bin as discrete cateogry 
+- both negative correlation and positive result in same MI value (ie can be inverse relationship)
+- calc perfect situation (var1 & var2 exact same for each obs) for relative scaling? 
+
+---------------------
+--- MODEL FITTING ---
+---------------------
+
+Model Fitting Strategy
+- For each method, do feature selection rather than feature extraction
+- Akaike information criterion (AIC) or something to penalise model complexity? 
+- plot num_features vs accuracy (or some other metric) to decide 
+- FDR for multiple testing needs to be calculated
+
+Decision Tree 
+- 
+Generalized Additive Model
+- https://ehp.niehs.nih.gov/doi/full/10.1289/EHP7246
+
+LOESS Model
+- https://ehp.niehs.nih.gov/doi/full/10.1289/EHP7246
+
+Other Possible Approaches
+- GLM 
+    - predictor dist: binomial|bernoulli
+    - link function:  log-odds
+- 

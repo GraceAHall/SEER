@@ -1,0 +1,42 @@
+TSTAGE_STD vs brain_met ---
+
+Using 156 records.
+TSTAGE_STD   1   2   3   4
+brain_met                 
+0           37  35   4   2
+1           23  24  11  20
+
+Mutual information Normalized: 0.086
+
+
+NSTAGE_STD vs brain_met ---
+
+Using 156 records.
+NSTAGE_STD   0   1
+brain_met         
+0           77   1
+1           52  26
+
+Mutual information Normalized: 0.188
+
+
+GSTAGE_STD vs brain_met ---
+
+Using 156 records.
+GSTAGE_STD  1   2  3   4
+brain_met               
+0           4  67  2   5
+1           0   0  0  78
+
+Mutual information Normalized: 0.742
+
+
+grade vs brain_met ---
+
+Using 155 records.
+grade      1.0  2.0  3.0  4.0
+brain_met                    
+0           10   39   29    0
+1            0   10   64    3
+
+Mutual information Normalized: 0.199
