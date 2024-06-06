@@ -1,0 +1,18 @@
+----------------------------------------
+--- IMPORTANT HISTOLOGICAL TYPE INFO ---
+----------------------------------------
+
+Lung
+    - Nonmucinous adenocarcinoma:                   ↑ Bone 
+    - Small cell carcinoma:                         ↑ Liver 
+    - large cell neuroendocrine carcinoma (LCNEC):  ↑ Liver; ↓ Bone 
+    - squamous cell carcinoma:                      ↓ CNS 
+
+Skin 
+    Melanoma 
+        - melanocytes 
+    Other Non-Epithelial Skin
+        - Basal cell carcinoma:     basal cells, 90% of non-melanoma skin cancers, slow growing, rarely spreads
+        - Squamous cell carcinoma:  squamous cells, slow growing, rarely spreads, but spreads more than basal
+        - Others 
+

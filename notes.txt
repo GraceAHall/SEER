@@ -3,27 +3,160 @@
 --- TODO ---
 ------------
 
-- Data access   [✔]
-- Data cleaning [✔] 
-- Data exploration [-] (doing)
-- Model fitting [-] (doing)
-- Add age, ethnicity, gender 
-- Breast: PCA clustering
-    - stage
-    - grade
-    - molecular sybtypes
-- Decision tree for breast with TSTAGE, NSTAGE, GRADE, molecular subtype (hist_type)
-- odds ratios GSTAGE_STD Lung vs Prostate
-- odds ratios GRADE Lung vs Prostate
+Features
+- CANCER_TYPE: the cancer 
+- CANCER_GROUP: logical groupings of CANCER_TYPE
+- CANCER_SUBTYPE: noteworthy subtypes (eg breast HR/HER2)
+- HIST_TYPE: cell type
+- PRIMARY_SITE: location where tumor has taken residence
 
-Questions 
-- Does the current common vs uncommon distinction apply? 
-- Is there something unique about cancers which metastasize to brain vs other regions? 
-- What is the relationship between locoregional lymph node spread & mets? local nodes, distant LN, mets
+
+- 'Brain' and 'Cranial Nerves Other Nervous System' share codes C710-C719
+- 'Melanoma of the Skin' and 'Other Non-Epithelial Skin' share codes C440-C449
+
+- primary_site is better than site. 
+- map primary_site to primary_site_group
+- priority: 1) actual organs 2) Nodal 3) Miscellaneous
+- primary_site 'Miscellaneous' -> None
+
+
+
+Histology
 - 
 
 
-- Is there a data-driven definition of common vs uncommon?
+
+
+Brain preference 
+- conditional probabilities (bayesian)
+- add other met sites? is this even ok? 
+- liver/bone/lung/brain
+- ratio of (brain met prevalence) vs (highest other prevalence)
+- ratio of (brain met prevalence) vs (combined other prevalence)
+- ratio of (brain met prevalence) vs (average other prevalence)
+- p(BM|any met)
+- ie > 1 if displays preference for brain 
+- 
+
+HR+/HER2-
+HR+/HER2+
+HR-/HER2-
+HR-/HER2+
+
+
+------------------
+--- LITERATURE ---
+------------------
+
+Common
+Lung, breast, skin, esophagus, kidney
+
+Uncommon 
+Leukemia, prostate, colorectal 
+
+
+Breast
+- Higher metastasis rate: Triple negative breast cancer (TNBC) and HER2 positive (HER2+)
+- Lower metastasis rate: Hormone receptor positive tumors (ER+ or PR+) 
+
+Lung
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9689009/
+- Only cases with pathologically confirmed diagnoses were included
+- Fields: 
+    - age at diagnosis
+    - sex 
+    - ICD-0-3 TNG stage, grade 
+    - histology codes
+    - histological diagnosis
+    - history of other malignancy
+    - presence of metastasis
+    - sites of distant metastasis
+    - presence of recurrence
+    - sites of recurrence
+- Younger patients have higher metastasis rate in most histologic subtypes
+- Bone (60%), CNS (45%), liver (25%) and adrenal gland (20%) are preferred secondary sites
+- histologic types are important
+    - Nonmucinous adenocarcinoma:                   ↑ Bone 
+    - Small cell carcinoma:                         ↑ Liver 
+    - large cell neuroendocrine carcinoma (LCNEC):  ↑ Liver; ↓ Bone 
+    - squamous cell carcinoma:                      ↓ CNS 
+
+
+-----------------
+--- QUESTIONS ---
+-----------------
+Lung, breast, skin, renal, colorectal
+- breast -> brain: low 
+- lung -> brain: high
+
+Propensity
+- eg prevalence within metastatic prostate cancer
+- prostate -> brain 
+- prostate -> other secondary sites
+
+prevalence - 1 timepoint 
+incidence  - 2 timepoint 
+
+biological vs clinical definitions
+looking forward vs retroactively
+
+Normalize for
+- slow vs fast (aggressiveness)
+- early detection vs late
+
+
+
+Factors which contribute to brain met risk 
+- primary 
+- histological type 
+- subtypes (well established clinical subtype / division of sig. proportion) (breast Hr/HER2)
+- age 
+- pediatric cancer? 
+
+
+Common vs uncommon
+1. Do the existing common | uncommon categories make sense? (prevalence) [✔] 
+    - What about splitting breast by subtype (HR/HER2 etc)
+
+2. Is there a better, data-driven definition of common vs uncommon? [-]
+    - TODO set min_cases=1000
+    - TODO incidence, not prevalence
+
+3. Do common | uncommons have differences in clinical features?
+    - TNM stage, group stage, grade, histology, rate of spread, blood markers, cancer subtypes (HER2+/- etc)
+
+Histology 
+- histology code may be more informative than primary 
+    - lung has high propensity for metastasis, but different hist_types show different patterns of metastasis
+    - 
+
+Secondary site
+4. For each primary, what is it's liver/bone/lung/brain secondary site tendancies (prevalence, incidence)
+5. What clinical feature(s) differentiate metastasis to brain, vs metastasis to other regions?
+    - include age, ethnicity, gender
+
+
+
+# not as important
+Lymph nodes
+6. What is the relationship between local vs distant nodes positive & brain met incidence?
+    - What is the incidence rate of brain met, if spread only to local lymph nodes?
+    - What is the incidence rate of brain met, if spread to distant lymph nodes?
+    - Incidence rate ratio of the above
+    - Survival curve (time to brain met) of the above
+
+7. clustering primaries vs brain met risk
+    - all features + smoking, breast subtype etc
+
+
+
+
+
+
+
+
+
+
 - Risk 
     - single variable 
     - multiple variables 
@@ -34,7 +167,6 @@ Questions
 Do brain mets develop differently for these categories?
 What features predict BM?
 Primary site, common, t_stage, n_stage, hist_type, etc
-Is common vs uncommon a useful distinction? 
 
 - INCIDENCE 
     - priamry_site

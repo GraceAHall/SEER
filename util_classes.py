@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 from typing import Optional, Any
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from functools import cached_property
 from util_enums import Grade, RegionalNodes, Behavior, Source
 from util_consts import SEP_CHAR, ISEP_CHAR, NA_CHAR
@@ -12,80 +12,85 @@ class Record:
     patient_death_year: Optional[int]
     diagnosis_year: int 
     diagnosis_agebin: str 
-    site: str
+    cancer_type: str
+    cancer_group: str
+    primary_type: str
+    primary_group: str
     t_stage_ajcc: Optional[str]
     n_stage_ajcc: Optional[str]
     g_stage_ajcc: Optional[str]
     t_stage_src: Source
     n_stage_src: Source
     g_stage_src: Source
-    hist_type: int 
-    hist_cateogry: str
     grade: Grade
     grade_src: Source
     regional_nodes: RegionalNodes
     behavior: Behavior
     num_malignant_tumors: int
     num_benign_tumors: int
-    site_category: str
-    primary_site: int
-    brain_met: bool
+    psa: Optional[float]
+    breast_subtype: Optional[str]
+    hist_type: int 
+    hist_cateogry: str
+    brain_met: Optional[bool]
+    bone_met: Optional[bool]
+    lung_met: Optional[bool]
+    liver_met: Optional[bool]
+    distant_ln: Optional[bool]
 
     def tostr(self) -> str:
-        fields = [
-            self.patient_id,
-            self.patient_death_year,
-            self.diagnosis_year,
-            self.diagnosis_agebin,
-            self.site,
-            self.t_stage_ajcc,
-            self.n_stage_ajcc,
-            self.g_stage_ajcc,
-            self.t_stage_src.value,
-            self.n_stage_src.value,
-            self.g_stage_src.value,
-            self.hist_type,
-            self.hist_cateogry,
-            None if self.grade == Grade.NA else self.grade.name,
-            self.grade_src.value,
-            None if self.regional_nodes == RegionalNodes.NA else self.regional_nodes.name,
-            self.behavior.name,
-            self.num_malignant_tumors,
-            self.num_benign_tumors,
-            self.site_category,
-            self.primary_site,
-            self.brain_met
-        ]
-        items = [str(x) if x is not None else NA_CHAR for x in fields]
-        return SEP_CHAR.join(items)
+        flist = [getattr(self, f.name) for f in fields(Record)]
+        for idx, val in enumerate(flist):
+            if isinstance(val, Source):
+                flist[idx] = val.value
+            elif isinstance(val, Behavior):
+                flist[idx] = val.name
+            elif isinstance(val, Grade | RegionalNodes):
+                flist[idx] = None if val in [Grade.NA, RegionalNodes.NA] else val.name 
+        flist = [str(x) if x is not None else NA_CHAR for x in flist]
+        return SEP_CHAR.join(flist)
     
     @classmethod
     def fromstr(cls, line: str) -> Record:
-        ln = line.strip().split(SEP_CHAR)
-        return Record(
-            patient_id=int(ln[0]),
-            patient_death_year=int(ln[1]) if ln[1] != NA_CHAR else None,
-            diagnosis_year=int(ln[2]),
-            diagnosis_agebin=ln[3],
-            site=ln[4],
-            t_stage_ajcc=ln[5] if ln[5] != NA_CHAR else None,
-            n_stage_ajcc=ln[6] if ln[6] != NA_CHAR else None,
-            g_stage_ajcc=ln[7] if ln[7] != NA_CHAR else None,
-            t_stage_src=Source.fromstr(ln[8]),
-            n_stage_src=Source.fromstr(ln[9]),
-            g_stage_src=Source.fromstr(ln[10]),
-            hist_type=int(ln[11]),
-            hist_cateogry=str(ln[12]),
-            grade=Grade.fromstr(ln[13]),
-            grade_src=Source.fromstr(ln[14]),
-            regional_nodes=RegionalNodes.fromstr(ln[15]),
-            behavior=Behavior.fromstr(ln[16]),
-            num_malignant_tumors=int(ln[17]),
-            num_benign_tumors=int(ln[18]),
-            site_category=ln[19],
-            primary_site=int(ln[20]),
-            brain_met=eval(ln[21])
-        )
+
+        # INT_FIELDS = [
+        #     'patient_id', 'patient_death_year', 'diagnosis_year', 'num_malignant_tumors', 
+        #     'num_benign_tumors', 'hist_type', 'primary_site'
+        # ]
+        # FLOAT_FIELDS = ['psa']
+        # BOOL_FIELDS = ['brain_met', 'bone_met', 'lung_met', 'liver_met', 'distant_ln']
+
+        lsplit = line.strip().split(SEP_CHAR)
+        flist = [(f.name, f.type) for f in fields(Record)]
+        typecorrect_values = []
+        for (fname, ftype), val in zip(flist, lsplit):
+            # str -> int
+            print()
+        return Record(*typecorrect_values)
+        # return Record(
+        #     patient_id=int(ln[0]),
+        #     patient_death_year=int(ln[1]) if ln[1] != NA_CHAR else None,
+        #     diagnosis_year=int(ln[2]),
+        #     diagnosis_agebin=ln[3],
+        #     site=ln[4],
+        #     t_stage_ajcc=ln[5] if ln[5] != NA_CHAR else None,
+        #     n_stage_ajcc=ln[6] if ln[6] != NA_CHAR else None,
+        #     g_stage_ajcc=ln[7] if ln[7] != NA_CHAR else None,
+        #     t_stage_src=Source.fromstr(ln[8]),
+        #     n_stage_src=Source.fromstr(ln[9]),
+        #     g_stage_src=Source.fromstr(ln[10]),
+        #     hist_type=int(ln[11]),
+        #     hist_cateogry=str(ln[12]),
+        #     grade=Grade.fromstr(ln[13]),
+        #     grade_src=Source.fromstr(ln[14]),
+        #     regional_nodes=RegionalNodes.fromstr(ln[15]),
+        #     behavior=Behavior.fromstr(ln[16]),
+        #     num_malignant_tumors=int(ln[17]),
+        #     num_benign_tumors=int(ln[18]),
+        #     site_category=ln[19],
+        #     primary_site=int(ln[20]),
+        #     brain_met=eval(ln[21])
+        # )
 
 BAD_SITES = ['Miscellaneous']
 
@@ -155,13 +160,13 @@ class Patient:
     
     @cached_property
     def first_tumor_site(self) -> str:
-        site1 = self.records[0].site
+        site1 = self.records[0].cancer_type
         if len(self.records) == 1 or site1 not in BAD_SITES:
             return site1 
         
         for rec in self.records[1:]:
-            if rec.site not in BAD_SITES:
-                return rec.site
+            if rec.cancer_type not in BAD_SITES:
+                return rec.cancer_type
         return site1 
     
     def todict(self) -> dict[str, Any]:
@@ -182,7 +187,7 @@ class Patient:
             'num_records': len(self.records),
             'timepoint_first': self.records[0].diagnosis_year,
             'timepoint_last': self.records[-1].diagnosis_year,
-            'sites': ISEP_CHAR.join([r.site for r in self.records]),
+            'sites': ISEP_CHAR.join([r.cancer_type for r in self.records]),
             'diag_years': ISEP_CHAR.join([str(r.diagnosis_year) for r in self.records]),
             'diag_agebins': ISEP_CHAR.join([r.diagnosis_agebin.replace(' years', '') for r in self.records]),
             't_stages': ISEP_CHAR.join([r.t_stage_ajcc if r.t_stage_ajcc is not None else NA_CHAR for r in self.records]),

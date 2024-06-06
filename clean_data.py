@@ -19,8 +19,12 @@ from util_maps import (
     GSTAGE_EOD_AJCC_MAP,
     GRADE_SEER_STD_MAP,
     GRADE_NAACCR_STD_MAP,
-    SITE_CATEGORY_MAP
+    CANCERTYPE_CANCERGROUP_MAP,
+    PRIMARYCODE_PRIMARYSITE_MAP,
+    PRIMARYCODE_PRIMARYSITE_RANGES,
 )
+
+PRIMARYCODE_PRIMARYSITE_RANGES.sort()
 
 # INFILE = '/home/grace/work/brainmets/SEER/BrainMetsQueryFull.sample.txt'
 # OUTFILE = '/home/grace/work/brainmets/SEER/BrainMetsQueryFull.sample.fmt.tsv'
@@ -74,11 +78,13 @@ def gen_record(line: str) -> Record:
     grade, grade_src = get_grade(lsplit)
     return Record(
         patient_id = int(lsplit[0]),
+        patient_death_year = get_death_year(lsplit),
         diagnosis_agebin = get_age_bin(lsplit),
         diagnosis_year = get_diagnosis_year(lsplit),
-        site = get_site(lsplit),
-        site_category = get_site_category(lsplit),
-        primary_site = get_primary_site(lsplit),
+        cancer_type = get_cancer_type(lsplit),
+        cancer_group = get_cancer_group(lsplit),
+        primary_type = get_primary_type(lsplit),
+        primary_group = get_primary_group(lsplit),
         t_stage_ajcc = t_stage,
         n_stage_ajcc = n_stage,
         g_stage_ajcc = g_stage,
@@ -91,11 +97,47 @@ def gen_record(line: str) -> Record:
         hist_cateogry = get_hist_category(lsplit),
         regional_nodes = get_regional_nodes(lsplit),
         behavior = get_behavior(lsplit),
-        patient_death_year = get_death_year(lsplit),
         num_malignant_tumors = get_malignant_tumors_count(lsplit),
         num_benign_tumors = get_benign_tumors_count(lsplit),
-        brain_met = get_brain_met(lsplit)
+        brain_met = get_brain_met(lsplit),
+        bone_met = get_bone_met(lsplit),
+        liver_met = get_liver_met(lsplit), 
+        lung_met = get_lung_met(lsplit),
+        distant_ln = get_distant_ln(lsplit),
+        breast_subtype = get_breast_subtype(lsplit),
+        psa = get_psa(lsplit),
     )
+
+def get_psa(lsplit: list[str]) -> Optional[float]:
+    """
+    0.1 or less nanograms/milliliter (ng/ml)
+    98.0 ng/ml or greater
+    Blank(s)
+    Not documented; not assessed; unknown
+    Test ordered, results not in chart
+    """
+    raw = lsplit[30]
+    # NA values
+    if raw.strip() in [
+        'Blank(s)', 
+        'Not documented; not assessed; unknown', 
+        'Test ordered, results not in chart'
+    ]:
+        return None
+    # min val
+    elif raw == '0.1 or less nanograms/milliliter (ng/ml)':
+        return float(0.1)
+    # max val
+    elif raw == '98.0 ng/ml or greater':
+        return float(98.0)
+    # [float in range 0-98]
+    else:
+        return float(raw)
+
+def get_breast_subtype(lsplit: list[str]) -> Optional[str]:
+    if lsplit[35] in ['Recode not available', 'Unknown']:
+        return None 
+    return lsplit[35]
 
 def get_age_bin(lsplit: list[str]) -> str:
     return lsplit[2]
@@ -108,15 +150,130 @@ def get_death_year(lsplit: list[str]) -> Optional[int]:
 def get_diagnosis_year(lsplit: list[str]) -> int:
     return int(lsplit[3])
 
-def get_site(lsplit: list[str]) -> str:
+def get_cancer_type(lsplit: list[str]) -> str:
     return lsplit[5]
 
-def get_site_category(lsplit: list[str]) -> str:
-    return SITE_CATEGORY_MAP[lsplit[5]]
+def get_cancer_group(lsplit: list[str]) -> str:
+    return CANCERTYPE_CANCERGROUP_MAP[lsplit[5]]
 
-def get_primary_site(lsplit: list[str]) -> int:
-    return int(lsplit[28])
+def get_primary_group(lsplit: list[str]) -> str:
+    primary = get_primary_type(lsplit)
+    if primary in CANCERTYPE_CANCERGROUP_MAP:
+        return CANCERTYPE_CANCERGROUP_MAP[primary]
 
+    assert '|' in primary
+    pgroups = set()
+    for psite in primary.split('|'):
+        psite = psite.strip()
+        if psite == 'Lymphatics':
+            for item in lsplit:
+                print(item)
+        pgroups.add(CANCERTYPE_CANCERGROUP_MAP[psite])
+    primary_group = ' | '.join(list(pgroups))
+    return primary_group
+
+NHL_BLACKLIST_CODES = {
+    24, 98, 99, 111, 142, 379, 420, 421, 422, 424, 
+    770, 771, 772, 773, 774, 775, 776, 777, 778, 779
+}
+LYMPHATICS_SITES = {
+    'Myeloma',
+    'Kaposi Sarcoma',
+    'Mesothelioma',
+    'Acute Lymphocytic Leukemia',
+    'Acute Monocytic Leukemia',
+    'Acute Myeloid Leukemia',
+    'Aleukemic, Subleukemic and NOS',
+    'Chronic Lymphocytic Leukemia',
+    'Chronic Myeloid Leukemia',
+    'Other Acute Leukemia',
+    'Other Myeloid/Monocytic Leukemia',
+    'Other Lymphocytic Leukemia',
+    'Hodgkin - Extranodal',
+    'Hodgkin - Nodal',
+    'NHL - Extranodal',
+    'NHL - Nodal',
+}
+
+def get_primary_type(lsplit: list[str]) -> str:
+    """
+    returns the site as per CANCER_TYPE. 
+    Miscellaneous <-> Tonsil | Lymphatics (99)
+    """
+    code = int(lsplit[28])
+    ctype = get_cancer_type(lsplit)
+    ptype = None
+
+    # map code to primary 
+    if code in PRIMARYCODE_PRIMARYSITE_MAP:  # must be first
+        ptype = PRIMARYCODE_PRIMARYSITE_MAP[code]
+    if ptype is None:
+        ptype = _binary_search_primary(code, PRIMARYCODE_PRIMARYSITE_RANGES)
+    """
+    Multimapping cases
+        Hodgkin - Extranodal: All other sites 
+        NHL - Extranodal: All sites except C024, C098-C099, C111, C142, C379, C420-C422, C424, C770-C779
+    """
+    if ptype is None:
+        if code in NHL_BLACKLIST_CODES:
+            ptype = 'Hodgkin - Extranodal'
+        else:
+            ptype = 'Hodgkin - Extranodal | NHL - Extranodal'
+    assert ptype
+
+    ### PRIMARY_TYPE == CANCER_TYPE ###
+    # single mapping
+    if _sites_match(ctype, ptype):
+        return ctype
+    # multiple mappings
+    if '|' in ptype:
+        selection = [p.strip() for p in ptype.split('|')]
+        for sel in selection:
+            if _sites_match(ctype, sel):
+                return ctype
+        
+    # Miscellaneous (multiple sites of cancer)
+    if ctype == 'Miscellaneous':
+        return ctype
+
+    ### PRIMARY_TYPE != CANCER_TYPE ###
+    # ensure ptype is a valid SEER term, or multiple valid SEER terms. 
+    if '|' in ptype:
+        selection = [p.strip() for p in ptype.split('|')]
+        for sel in selection:
+            assert sel in CANCERTYPE_CANCERGROUP_MAP
+    else:
+        assert ptype in CANCERTYPE_CANCERGROUP_MAP
+    return ptype
+
+def _sites_match(site1: str, site2: str) -> bool:
+    """
+    special cases: Lymphatics, Miscellaneous
+    """
+    if site1 == site2:
+        return True
+    if site2 == 'Lymphatics' and site1 in LYMPHATICS_SITES:
+        return True
+    return False 
+
+def _print_mismatch_primary(pid: str, site: str, primary: str) -> None:
+    print(f'PRIMARY MISMATCH: pid={pid}, site={site}, primary={primary}')
+
+def _binary_search_primary(code: int, ranges: list) -> Optional[str]:
+    mid = len(ranges) // 2
+    if len(ranges) == 0:
+        return None
+    elif ranges[mid][0] <= code and code <= ranges[mid][1]:
+        return ranges[mid][2]
+    elif mid == 0:
+        return None
+    elif ranges[mid][0] < code:
+        return _binary_search_primary(code, ranges[mid:])
+    else:
+        return _binary_search_primary(code, ranges[:mid])
+    
+
+    
 def get_t_stage_raw(lsplit: list[str]) -> Tuple[str|None, str]:
     # ajcc (2004-2015)
     ajcc_6th, ajcc_7th = lsplit[8], lsplit[10]
@@ -260,7 +417,7 @@ def get_grade(lsplit: list[str]) -> Tuple[Grade, Source]:
     """
     
     # NAACCR (priority)
-    site = get_site(lsplit)
+    site = get_cancer_type(lsplit)
     g_naaccr_clin = None if lsplit[26] == 'Blank(s)' else lsplit[26]
     g_naaccr_path = None if lsplit[27] == 'Blank(s)' else lsplit[27]
     if g_naaccr_path:
@@ -325,8 +482,48 @@ def get_behavior(lsplit: list[str]) -> Behavior:
         return Behavior.BENIGN
     raise ValueError
 
-def get_brain_met(lsplit: list[str]) -> bool:
-    return True if lsplit[7] == 'Yes' else False 
+def get_brain_met(lsplit: list[str]) -> Optional[bool]:
+    if lsplit[7] == 'Yes':
+        return True
+    if lsplit[7] == 'No':
+        return False
+    return None
+
+def get_bone_met(lsplit: list[str]) -> Optional[bool]:
+    if lsplit[31] == 'Yes':
+        return True
+    if lsplit[31] == 'No':
+        return False
+    return None
+
+def get_liver_met(lsplit: list[str]) -> Optional[bool]:
+    if lsplit[32] == 'Yes':
+        return True
+    if lsplit[32] == 'No':
+        return False
+    return None
+
+def get_lung_met(lsplit: list[str]) -> Optional[bool]:
+    if lsplit[33] == 'Yes':
+        return True
+    if lsplit[33] == 'No':
+        return False
+    return None
+
+def get_distant_ln(lsplit: list[str]) -> Optional[bool]:
+    """
+    Blank(s)
+    None; no lymph node metastases
+    Not applicable
+    Unknown
+    Yes; distant lymph node metastases
+    """
+    raw = lsplit[34]
+    if raw == 'None; no lymph node metastases':
+        return False 
+    if raw == 'Yes; distant lymph node metastases':
+        return True 
+    return None
 
 def get_regional_nodes(lsplit: list[str]) -> RegionalNodes:
     the_num = int(lsplit[24])
