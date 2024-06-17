@@ -22,5 +22,17 @@
                 "/home/grace/work/SEER/data/SEER_2010_2020.clean.test.tsv",
             ]
         },
+        {
+            "name": "histology: merge_definitions.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/home/grace/work/SEER/data/histology/merge_definitions.py",
+            "console": "integratedTerminal",
+            "args": [
+                "/home/grace/work/SEER/data/histology/temp1.tsv",
+                "/home/grace/work/SEER/data/histology/temp2.tsv",
+                "/home/grace/work/SEER/data/histology/histcodes.tsv",
+            ]
+        },
     ]
 }

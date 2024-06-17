@@ -6,11 +6,15 @@ from functools import cached_property
 from util_enums import Grade, RegionalNodes, Behavior, Source
 from util_consts import SEP_CHAR, ISEP_CHAR, NA_CHAR
 
+
+### RECORD LEVEL ###
+
 @dataclass
-class Record:
+class SeerRecord:
     patient_id: int 
     patient_death_year: Optional[int]
     diagnosis_year: int 
+    followup_year: int 
     diagnosis_agebin: str 
     cancer_type: str
     cancer_group: str
@@ -39,7 +43,7 @@ class Record:
     distant_ln: Optional[bool]
 
     def tostr(self) -> str:
-        flist = [getattr(self, f.name) for f in fields(Record)]
+        flist = [getattr(self, f.name) for f in fields(SeerRecord)]
         for idx, val in enumerate(flist):
             if isinstance(val, Source):
                 flist[idx] = val.value
@@ -51,7 +55,7 @@ class Record:
         return SEP_CHAR.join(flist)
     
     @classmethod
-    def fromstr(cls, line: str) -> Record:
+    def fromstr(cls, line: str) -> SeerRecord:
 
         # INT_FIELDS = [
         #     'patient_id', 'patient_death_year', 'diagnosis_year', 'num_malignant_tumors', 
@@ -61,36 +65,19 @@ class Record:
         # BOOL_FIELDS = ['brain_met', 'bone_met', 'lung_met', 'liver_met', 'distant_ln']
 
         lsplit = line.strip().split(SEP_CHAR)
-        flist = [(f.name, f.type) for f in fields(Record)]
+        flist = [(f.name, f.type) for f in fields(SeerRecord)]
         typecorrect_values = []
         for (fname, ftype), val in zip(flist, lsplit):
             # str -> int
             print()
-        return Record(*typecorrect_values)
-        # return Record(
-        #     patient_id=int(ln[0]),
-        #     patient_death_year=int(ln[1]) if ln[1] != NA_CHAR else None,
-        #     diagnosis_year=int(ln[2]),
-        #     diagnosis_agebin=ln[3],
-        #     site=ln[4],
-        #     t_stage_ajcc=ln[5] if ln[5] != NA_CHAR else None,
-        #     n_stage_ajcc=ln[6] if ln[6] != NA_CHAR else None,
-        #     g_stage_ajcc=ln[7] if ln[7] != NA_CHAR else None,
-        #     t_stage_src=Source.fromstr(ln[8]),
-        #     n_stage_src=Source.fromstr(ln[9]),
-        #     g_stage_src=Source.fromstr(ln[10]),
-        #     hist_type=int(ln[11]),
-        #     hist_cateogry=str(ln[12]),
-        #     grade=Grade.fromstr(ln[13]),
-        #     grade_src=Source.fromstr(ln[14]),
-        #     regional_nodes=RegionalNodes.fromstr(ln[15]),
-        #     behavior=Behavior.fromstr(ln[16]),
-        #     num_malignant_tumors=int(ln[17]),
-        #     num_benign_tumors=int(ln[18]),
-        #     site_category=ln[19],
-        #     primary_site=int(ln[20]),
-        #     brain_met=eval(ln[21])
-        # )
+        return SeerRecord(*typecorrect_values)
+
+
+
+
+### PATIENT LEVEL ####
+
+
 
 BAD_SITES = ['Miscellaneous']
 
@@ -127,9 +114,9 @@ class Patient:
         self.behavior: Behavior = Behavior.BENIGN
         self.num_malignant_tumors: int = 0
         self.num_benign_tumors: int = 0
-        self.records: list[Record] = []
+        self.records: list[SeerRecord] = []
 
-    def update(self, record: Record) -> None:
+    def update(self, record: SeerRecord) -> None:
         # update attributes
         if self.death_year is None:
             self.death_year = record.patient_death_year
@@ -151,11 +138,11 @@ class Patient:
         self.records = cleaned_records
     
     @cached_property
-    def first_tumor(self) -> Record:
+    def first_tumor(self) -> SeerRecord:
         return self.records[0]
     
     @cached_property
-    def last_tumor(self) -> Record:
+    def last_tumor(self) -> SeerRecord:
         return self.records[-1]
     
     @cached_property

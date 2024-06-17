@@ -1,47 +1,157 @@
 
+
+
+----------------
+--- FINDINGS ---
+----------------
+
+Which cancer types frequently metastasize to the brain?
+- 
+
+Which histological types frequently metastasize to the brain?
+- hist_cateogry
+    - zero groups prefer brain.
+    - 
+- hist_type_descr
+    - only 'solid carcinoma' prefers brain. 
+
+What about histological subtypes for a given cancer type? 
+- 
+
+
+Common vs uncommon (cancer_group)
+- NO 
+- 'Lung and Bronchus' is 
+
+Histology 
+
 ------------
 --- TODO ---
 ------------
 
-Features
-- CANCER_TYPE: the cancer 
-- CANCER_GROUP: logical groupings of CANCER_TYPE
-- CANCER_SUBTYPE: noteworthy subtypes (eg breast HR/HER2)
-- HIST_TYPE: cell type
-- PRIMARY_SITE: location where tumor has taken residence
+- multivariate predictor with feature selection
+- overlaid line plots instead of heatmap 
+    - classic connected scatterplot style
+    - 
+    - Breast      -----T1----T2----T3----
+    - Colorectal  -----T1----T2-T3-------
 
 
-- 'Brain' and 'Cranial Nerves Other Nervous System' share codes C710-C719
-- 'Melanoma of the Skin' and 'Other Non-Epithelial Skin' share codes C440-C449
+Lung met to Lung???
 
-- primary_site is better than site. 
-- map primary_site to primary_site_group
-- priority: 1) actual organs 2) Nodal 3) Miscellaneous
-- primary_site 'Miscellaneous' -> None
+https://staging.seer.cancer.gov/tnm/schema/1.0/liver/?breadcrumbs=(~schema_list~)
+
+information about metastatic sites: (search 'Metastatic Sites')
+https://www.facs.org/media/j30havyf/ajcc_7thed_cancer_staging_manual.pdf
+
+Liver only NX, N0, N1
+(Page 133)
+https://www.facs.org/media/tauiudl3/ajcc_6thed_cancer_staging_manual_part1.pdf
+
+SEER 
+- month of diagnosis / month of diagnosis recode can't be used for case listings (only survival?)
+- sessions 
+    - frequency 
+    - rate 
+    - survival 
+    - limited-duration prevalence
+
+Features 
+- do following site groups per feature below:
+    - all (general trend)
+    - lung vs rest
+    - common vs uncommon 
+    - each cancer_type/cancer_group
+- t_stage_ajcc
+- n_stage_ajcc
+- g_stage_ajcc (careful, breast etc have different staging)
+- Grade 
+- regional_nodes
+- distant_ln mets 
+- age 
+- gender 
+- diagnosis_year
+- diagnosis_agebin 
+- num_malignant_tumors
+- num_benign_tumors
+- hist_type / hist_type_descr / hist_cateogry
+
+
+Prevalence Metrics 
+- Prevalence
+- Odds ratio 
+
+Incidence Metrics 
+- Incidence rate ratio
+- Cox proportional hazards
+
+Filtering
+- interested in denovo met 
+- primary brain isn't relevant for cancer_type feature calculations
+    - Remove patients with brain as cancer_type
+    - 73973 records
+    - 71510 patients
+- Keep 'Unknown' as a category for site (tissue types)
+- remove any records which are 'BENIGN'
+- patients with multiple records of same cancer_type
+    - choose first record
+    - unless hist_type is different 
+
+                            brain_met?
+2015    Kidney  MALIGNANT       False    <- prevalence: use this record
+2017    Breast  MALIGNANT       True     <- prevalence: use this record
+2018    Breast  MALIGNANT       False    <- prevalence: ignore
+2020    Breast  MALIGNANT       True     <- prevalence: ignore
 
 
 
-Histology
+
+define common uncommon 
+- lowgrade initial incidence 
+- highgrade initial prevalence 
+
+kaplan meyer 
+- 2010-2014 vs 2015-2019
 - 
 
+
+Breast      T1->T4 risk ratio brain met 1:130 
+Colorectal  T1->T4 risk ratio brain met 1:2
 
 
 
 Brain preference 
-- conditional probabilities (bayesian)
-- add other met sites? is this even ok? 
-- liver/bone/lung/brain
-- ratio of (brain met prevalence) vs (highest other prevalence)
-- ratio of (brain met prevalence) vs (combined other prevalence)
-- ratio of (brain met prevalence) vs (average other prevalence)
-- p(BM|any met)
-- ie > 1 if displays preference for brain 
-- 
+- BRAIN_PREFERENCE_MEASURE: ratio of bm vs highest nonbm category
+- code for incidence: 
+    - use for breast subtypes
+    - incidence rate ratios
+- survival curves: 
+    - explore why weird 
+    - do for lung/liver/bone as sanity check? 
+- Normalisation:
+    - slow vs fast (aggressiveness)
+    - early detection vs late
+- placenta
 
-HR+/HER2-
-HR+/HER2+
-HR-/HER2-
-HR-/HER2+
+
+Factors 
+- cancer_type 
+- cancer_group 
+- diagnosis year
+- age at diagnosis
+- num benign tumors
+- num malignant tumors
+- gender
+- histologic_type 
+- histologic_code  
+- histologic_code  
+
+-----------------------------
+--- METASTASIS PREFERENCE ---
+-----------------------------
+https://www.nature.com/articles/s41568-022-00497-8
+
+oncofetal signatures in brain metastasis 
 
 
 ------------------
@@ -53,7 +163,6 @@ Lung, breast, skin, esophagus, kidney
 
 Uncommon 
 Leukemia, prostate, colorectal 
-
 
 Breast
 - Higher metastasis rate: Triple negative breast cancer (TNBC) and HER2 positive (HER2+)
@@ -82,6 +191,9 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9689009/
     - squamous cell carcinoma:                      ↓ CNS 
 
 
+8140 Adenocarcinoma
+
+
 -----------------
 --- QUESTIONS ---
 -----------------
@@ -99,10 +211,6 @@ incidence  - 2 timepoint
 
 biological vs clinical definitions
 looking forward vs retroactively
-
-Normalize for
-- slow vs fast (aggressiveness)
-- early detection vs late
 
 
 

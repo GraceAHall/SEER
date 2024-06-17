@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 from dataclasses import fields
 import re 
 
-from util_classes import Record
+from util_classes import SeerRecord
 from util_enums import Grade, Behavior, RegionalNodes, Source
 from util_maps import (
     TSTAGE_AJCC,
@@ -44,7 +44,7 @@ def main() -> None:
     infp = open(INFILE, 'r')
     outfp = open(OUTFILE, 'w')
     i = 0
-    outfp.write('\t'.join([f.name for f in fields(Record)]) + '\n')
+    outfp.write('\t'.join([f.name for f in fields(SeerRecord)]) + '\n')
     line = infp.readline()
     while line:
         if i % 100000 == 0:
@@ -70,17 +70,18 @@ DATA_FIELDS:
 [25]    Grade_recode    Grade_Clin      Grade_Path       
 """
 
-def gen_record(line: str) -> Record:
+def gen_record(line: str) -> SeerRecord:
     lsplit = line.strip().split('\t')
     t_stage, t_src = get_stage_ajcc(lsplit[8], lsplit[10], lsplit[12], lsplit[14], 't')
     n_stage, n_src = get_stage_ajcc(lsplit[9], lsplit[11], lsplit[13], lsplit[15], 'n')
     g_stage, g_src = get_stage_ajcc(lsplit[16], lsplit[17], lsplit[18], lsplit[19], 'g')
     grade, grade_src = get_grade(lsplit)
-    return Record(
+    return SeerRecord(
         patient_id = int(lsplit[0]),
         patient_death_year = get_death_year(lsplit),
         diagnosis_agebin = get_age_bin(lsplit),
         diagnosis_year = get_diagnosis_year(lsplit),
+        followup_year = get_followup_year(lsplit),
         cancer_type = get_cancer_type(lsplit),
         cancer_group = get_cancer_group(lsplit),
         primary_type = get_primary_type(lsplit),
@@ -150,6 +151,9 @@ def get_death_year(lsplit: list[str]) -> Optional[int]:
 def get_diagnosis_year(lsplit: list[str]) -> int:
     return int(lsplit[3])
 
+def get_followup_year(lsplit: list[str]) -> int:
+    return int(lsplit[36])
+
 def get_cancer_type(lsplit: list[str]) -> str:
     return lsplit[5]
 
@@ -193,6 +197,10 @@ LYMPHATICS_SITES = {
     'Hodgkin - Nodal',
     'NHL - Extranodal',
     'NHL - Nodal',
+}
+MESOTHELIOMA_SITES = {
+    'Pleura',
+    'Peritoneum, Omentum and Mesentery',
 }
 
 def get_primary_type(lsplit: list[str]) -> str:
