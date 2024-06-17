@@ -1,6 +1,5 @@
 
 
-
 ----------------
 --- FINDINGS ---
 ----------------
@@ -11,19 +10,15 @@ Which cancer types frequently metastasize to the brain?
 Which histological types frequently metastasize to the brain?
 - hist_cateogry
     - zero groups prefer brain.
-    - 
 - hist_type_descr
     - only 'solid carcinoma' prefers brain. 
 
 What about histological subtypes for a given cancer type? 
 - 
 
+Common vs uncommon 
+- 'Lung and Bronchus' is category onto itself. 
 
-Common vs uncommon (cancer_group)
-- NO 
-- 'Lung and Bronchus' is 
-
-Histology 
 
 ------------
 --- TODO ---
