@@ -434,13 +434,11 @@ CGROUPS_NSTAGES_N0N1N2N3 = {
     'Anus, Anal Canal and Anorectum',
     'Breast',
     'Esophagus',
-    'Hodgkin Lymphoma',
     'Kaposi Sarcoma',
     'Leukemia',
     'Lung and Bronchus',
     'Mesothelioma',
     'Miscellaneous',
-    'Non-Hodgkin Lymphoma',
     'Nose, Nasal Cavity and Middle Ear',
     'Oral',
     'Other Digestive Organs',
@@ -452,39 +450,44 @@ CGROUPS_NSTAGES_N0N1N2N3 = {
     'Testis',
     'Throat',
     'Trachea, Mediastinum and Other Respiratory Organs',
-    'Ureter',
     'Urinary Bladder',
     'Vulva',
+    'Larynx',
+    'Penis',
+    'Ureter',
 }
 
 CGROUPS_NSTAGES_N0N1N2 = {
-    'Appendix',
-    'Penis',
     'Other Urinary Organs',
     'Kidney and Renal Pelvis',
     'Other Endocrine including Thymus',
-    'Larynx',
     'Uterus',
     'Colorectal',
     'Gallbladder',
     'Small Intestine',
-
+    'Appendix (carcinoma)',
+    'Corpus Uteri (carcinoma)',
 }
 
 CGROUPS_NSTAGES_N0N1 = {
-    'Intrahepatic Bile Duct',
-    'Peritoneum, Omentum and Mesentery',
-    'Ovary',
-    'Other Biliary',
+    'Other Female Genital Organs',
     'Soft Tissue including Heart',
     'Thyroid',
-    'Other Female Genital Organs',
     'Eye and Orbit',
     'Prostate',
     'Bones and Joints',
     'Cervix',
     'Retroperitoneum',
-    'Pancreas',
     'Vagina',
     'Liver',
+    'Ovary',
+    'Intrahepatic Bile Duct',
+    'Pancreas',                 # AJCC 7th page 257
+    'Other Biliary',
+    'Appendix (carcinoid)',
+    'Corpus Uteri (sarcoma)',
+}
+
+WEIRD_NSTAGES = {
+    'Peritoneum, Omentum and Mesentery', # ???
 }

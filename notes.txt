@@ -1,29 +1,209 @@
 
+-----------------
+--- CombiMets ---
+-----------------
+
+- tree data is adjacency list 
+- using python pkg to draw tree
+- clustered the trees (for some unknown reason)
+    - 'reveals' topology
+- dpclust 
+    - https://github.com/Wedge-lab/dpclust
+    - unsure how to identify reseeding 
 
 ----------------
---- FINDINGS ---
+--- AJCC 7th ---
 ----------------
+https://www.facs.org/media/j30havyf/ajcc_7thed_cancer_staging_manual.pdf
 
-Which cancer types frequently metastasize to the brain?
-- 
+general notes 
+- pancreas, 'other biliary' have N01 staging. why some cases of N2?
+- appendix:
+    - Carcinoma & Carcinoid are distinct categories 
+    - Carcinoma == N012  
+    - Carcinoid == N01  
+- Corpus Uteri:
+    - Carcinomas * Sarcomas are distinct categories 
+        - Carcinosarcomas should be staged as carcinoma. 
+    - Carcinomas == N012 
+    - Sarcomas   == N01  
 
-Which histological types frequently metastasize to the brain?
-- hist_cateogry
-    - zero groups prefer brain.
-- hist_type_descr
-    - only 'solid carcinoma' prefers brain. 
+- CS tumor size % CS extension eval == method for evaluating T-stage 
+- CS lymph nodes eval               == method for evaluating N-stage 
+- T-stage 
+    - size or contiguous extension of the primary tumor. 
+    - roles of the size component and the extent of contiguous spread in defining T are specifically defined for each cancer site
+- N-stage 
+    - Absence, or presence and extent of cancer in the regional draining lymph nodes. 
+    - Nodal involvement is categorized by the number of positive nodes, and 
+    - for certain cancer sites by the involvement of specific regional nodal groups. 
 
-What about histological subtypes for a given cancer type? 
-- 
+- for some cancers in AJCC7th and above, M1b designates distant metastases.
+- Stage is a combination of TNM. 
+                      T    N    M
+  eg Lung Stage IIA:  T2b  N0  M0
+                      T1a  N1  M0
+                      T1b  N1  M0
+                      T2a  N1  M0 
+  
+  eg Lung Stage IIIA: T1a  N2  M0
+                      T1b  N2  M0
+                      T2a  N2  M0
+                      T2b  N2  M0
+                      T3   N1  M0
+                      T3   N2  M0
+                      T4   N0  M0       <- T4 + N0/N1 (N2/N3 pushes you into stage IIIB) 
+                      T4   N1  M0       <- 
+  
+  eg Lung Stage IV    Any  Any M1a
+                      Any  Any M1b
 
-Common vs uncommon 
-- 'Lung and Bronchus' is category onto itself. 
+Thyroid (page 103)
+- N-stage 
+    N0      No regional lymph node metastasis
+    N1      Regional lymph node metastasis
 
+lung (page 269)
+- changes: 
+    6th                     7th 
+    -----------------------------
+    T2 (>7 cm in size)       T3 
+    T4 (same lobe nodules)   T3
+
+- Clinical T-stage
+    T0      No evidence of primary tumor
+    T1      Tumor < 3 cm.
+            surrounded by lung or visceral pleura.
+            not in the main bronchus.
+    T2      3cm <= Tumor <= 7cm, or any of the following:
+            - Involves main bronchus
+            - Invades visceral pleura
+            - Associated with local atelectasis or obstructive pneumonitis
+    T3      Tumor > 7 cm, or tumor directly invades:
+            - parietal pleural 
+            - diaphragm 
+            - etc 
+    T4      Tumor of any size that invades any of the following:
+            - mediastinum
+            - heart 
+            - etc 
+
+- Clinical N-stage 
+    N0      No regional lymph node metastases
+    N1      Metastasis in ipsilateral peribronchial and/or ipsilateral hilar lymph nodes
+            and intrapulmonary nodes, including involvement by direct extension.
+    N2      Metastasis in ipsilateral mediastinal and/or subcarinal lymph node(s)
+    N3      Metastasis in 
+            - contralateral mediastinal, 
+            - contralateral hilar, 
+            - ipsilateral or contralateral scalene, or 
+            - supraclavicular lymph node(s)
+
+prostate (page 473)
+- changes:
+    - Extraprostatic invasion with microscopic bladder neck invasion (T4) is included with T3a
+    - Gleason Score now recognized as the preferred grading system
+
+- Clinical T-stage
+    T0      No evidence of primary tumor
+    T1      Clinically inapparent tumor neither palpable nor visible by imaging.
+    T2      Tumor confined within prostate
+    T3      Tumor extends through the prostate capsule
+    T4      Tumor is fixed or invades adjacent structures other than seminal vesicles. eg 
+            - external sphincter
+            - rectum
+            - bladder
+            - etc 
+
+- Pathologic T-stage
+    T2      Organ confined 
+    T3      Extraprostatic extension
+    T4      Invasion of rectum, levator muscles, and /or pelvic wall 
+
+- Clinical N-stage 
+    N0      No regional lymph node metastasis
+    N1      Metastasis in regional lymph node(s)
 
 ------------
 --- TODO ---
 ------------
+https://www.aacr.org/blog/2022/01/21/new-dimensions-in-cancer-biology-updated-hallmarks-of-cancer-published/
+^ 2022 hallmarks of cancer 
 
+https://www.nature.com/articles/s41586-022-04738-6
+^ copy number signatures. Seems good to do for BM right now. Big ez win. 
+
+https://cancer.sanger.ac.uk/cmc/help
+^ cancer mutation census data has richer data than previously thought. 
+  eg tiers are well explained, sources of data etc, and has hallmarks for each gene.
+
+NA values 
+- only 522588 records with 
+
+heatmap but instead of cancer_group its broken down by Tstage / Grade etc
+
+
+Angles:
+- Clinical vs biological common/uncommon 
+    - prevalence vs cases 
+    - p(BM | met)
+- Features (TNG-stage) which contribute to BM risk
+    - locoregional vs distant lymph nodes 
+    - cancer_group? profiles? Cancer types which are similar in profile 
+
+
+
+- Loco; Dist; Loco-Dist;
+    Brain   ------|-x-----
+    Bone    ------|-----x-
+    Lung    ----x-|-------
+    Liver   ----x-|-------
+
+Normalise TNG-stage 
+
+
+Paper 
+- Lung smoker/non-smoker risk profiles similar or different? 
+
+- Prevalence & new definition of common 
+    - barplot case load, brain / lung etc prevalence
+    - common vs uncommon (prevalence, preference)
+
+- TNM & Brain met risk 
+    - T-stage more important than N/G 
+
+- cancer type more important than histological type 
+- some cancers histology doesn't mean anything, some cancer show different patterns based on hist type 
+- breast: epilthelial neoplasms == LUNG types 
+- Breast 
+    - Is it T-stage or subtype which is more important for BM risk? 
+    - clustermap: breast try T-stage as group, subtype as feature
+- Prostate & Thyroid are similar 
+- PSA linear increasing trend in BM risk 
+- All GI are similar 
+- N0 -> N1N2 -> N3 
+- dramatic vs rapid increases in risk 
+    - lineplots
+- TNBC odd dip at N2
+
+
+
+
+
+
+- forest plots about risk 
+
+
+
+
+
+
+
+
+
+- heatmaps 
+    - add underlying numbers 
+- all cancer types (overall)
 - multivariate predictor with feature selection
 - overlaid line plots instead of heatmap 
     - classic connected scatterplot style

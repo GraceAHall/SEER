@@ -96,7 +96,9 @@ def gen_record(line: str) -> SeerRecord:
         grade_src = grade_src,
         hist_type = get_hist_type(lsplit),
         hist_cateogry = get_hist_category(lsplit),
-        regional_nodes = get_regional_nodes(lsplit),
+        regional_nodes = get_regional_nodes_category(lsplit),
+        regional_nodes_examined = get_regional_nodes_examined(lsplit),
+        regional_nodes_positive = get_regional_nodes_positive(lsplit),
         behavior = get_behavior(lsplit),
         num_malignant_tumors = get_malignant_tumors_count(lsplit),
         num_benign_tumors = get_benign_tumors_count(lsplit),
@@ -533,16 +535,44 @@ def get_distant_ln(lsplit: list[str]) -> Optional[bool]:
         return True 
     return None
 
-def get_regional_nodes(lsplit: list[str]) -> RegionalNodes:
-    the_num = int(lsplit[24])
-    if the_num == 0:
+def get_regional_nodes_category(lsplit: list[str]) -> RegionalNodes:
+    """
+    examined
+    95	No regional nodes were removed, but aspiration of regional nodes was performed
+    96	Regional lymph node removal was documented as a sampling, and the number of nodes is unknown/not stated
+    97	Regional lymph node removal was documented as a dissection, and the number of nodes is unknown/not stated
+    98	Regional lymph nodes were surgically removed, but the number of lymph nodes is unknown/not stated and not documented as a sampling or dissection; nodes were examined, but the number is unknown
+    99	It is unknown whether nodes were examined; not stated in patient record
+    
+    positive
+    95	Positive aspiration or core biopsy of lymph node(s)
+    97	Positive nodes - number unspecified
+    98	No nodes examined
+    99	Unknown if nodes are positive; not applicable
+    Not documented in patient record
+    """
+    num_positive = int(lsplit[24])
+
+    if num_positive == 0:
         return RegionalNodes.NEG
-    elif the_num == 95:
+    elif num_positive == 95:
         return RegionalNodes.POS_ASPIRATION
-    elif the_num == 98 or the_num == 99:
+    elif num_positive == 98 or num_positive == 99:
         return RegionalNodes.NA
     else:
         return RegionalNodes.POS_NODES
+
+def get_regional_nodes_examined(lsplit: list[str]) -> Optional[int]:
+    num_examined = int(lsplit[23])
+    if 0 <= num_examined <= 90:
+        return num_examined 
+    return None
+
+def get_regional_nodes_positive(lsplit: list[str]) -> Optional[int]:
+    num_positive = int(lsplit[24])
+    if 0 <= num_positive <= 90:
+        return num_positive 
+    return None
 
 def get_malignant_tumors_count(lsplit: list[str]) -> int:
     return 0 if lsplit[20] == 'Unknown' else int(lsplit[20]) 

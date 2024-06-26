@@ -6,6 +6,17 @@ from functools import cached_property
 from util_enums import Grade, RegionalNodes, Behavior, Source
 from util_consts import SEP_CHAR, ISEP_CHAR, NA_CHAR
 
+### SETTINGS FOR NOTEBOOKS ###
+@dataclass 
+class Settings:
+    RATE_FIELD = 'prevalence (%)'
+    NORM_FIELD = 'norm'
+    NORM_METH = 'sum'
+    COMPOUND_FEATURE = 'derived_feature'
+    COMPOUND_GROUP = 'derived_group'
+    THRESH_RECORDS = 1000
+    THRESH_POSITIVE = 3
+
 
 ### RECORD LEVEL ###
 
@@ -29,6 +40,8 @@ class SeerRecord:
     grade: Grade
     grade_src: Source
     regional_nodes: RegionalNodes
+    regional_nodes_examined: Optional[int]
+    regional_nodes_positive: Optional[int]
     behavior: Behavior
     num_malignant_tumors: int
     num_benign_tumors: int
