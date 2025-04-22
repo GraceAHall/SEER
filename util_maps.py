@@ -227,6 +227,10 @@ CANCERTYPE_CANCERGROUP_MAP = {
     'Salivary Gland': 'Oral',
     'Floor of Mouth': 'Oral',
     'Gum and Other Mouth': 'Oral',
+    'Corpus Uteri (carcinoma)': 'Corpus Uteri (carcinoma)',
+    'Corpus Uteri (sarcoma)': 'Corpus Uteri (sarcoma)',
+    'Appendix (carcinoid)': 'Appendix (carcinoid)',
+    'Appendix (carcinoma)': 'Appendix (carcinoma)',
     
     # Throat
     'Nasopharynx': 'Throat',
@@ -273,8 +277,8 @@ CANCERTYPE_CANCERGROUP_MAP = {
     'NHL - Nodal': 'Non-Hodgkin Lymphoma',
     
     # CNS
-    'Brain': 'CNS',
-    'Cranial Nerves Other Nervous System': 'CNS',
+    'Brain': 'Brain',
+    'Cranial Nerves Other Nervous System': 'Cranial Nerves Other Nervous System',
     
     # unchanged
     'Trachea, Mediastinum and Other Respiratory Organs': 'Trachea, Mediastinum and Other Respiratory Organs',
@@ -486,8 +490,12 @@ CGROUPS_NSTAGES_N0N1 = {
     'Other Biliary',
     'Appendix (carcinoid)',
     'Corpus Uteri (sarcoma)',
+    'Cranial Nerves Other Nervous System',
 }
 
-WEIRD_NSTAGES = {
+NSTAGE_IGNORES = {
+    'Hodgkin Lymphoma',
+    'Non-Hodgkin Lymphoma',
     'Peritoneum, Omentum and Mesentery', # ???
 }
+

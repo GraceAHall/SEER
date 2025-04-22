@@ -1,4 +1,225 @@
 
+
+-------------
+--- PAPER ---
+-------------
+Journal: JCO / Lancet
+figure 1: log odds ratio -> relative risk (with error bars)
+figure 1: add secondary site 'preference'
+
+
+----------------
+--- WRITE UP ---
+----------------
+
+Summary of data accessed
+- how many patients / records
+- year range
+- patients at first presentation 
+
+Figure 1: color case load by common vs uncommon
+Figure 2: take out 'miscellaneous category'
+Figure 2: fix wording of main takeaway 
+Last figure in SEER metastasis slide deck - yes odds ratios good. 
+
+
+---------------------
+--- SEER SURVIVAL ---
+---------------------
+- common vs uncommon 
+    - 2010-2015 vs 2016-2020
+    - common had improvements in survival, but rare did not. 
+- LN negative vs local vs distant 
+
+-----------------
+--- SEER CASE ---
+-----------------
+
+- NECTIN4
+- Lymph-vascular Invasion (2004+ varying by schema)
+- Site-Specific Data Items is goldmine? 
+- 
+- age 
+    - 'productive years life lost'
+- prostate cancer often grows for 15-20 years before diagnosis
+- how can we measure aggressiveness? eg time from T1 -> T2 
+- 
+
+DONE
+- odds ratios instead of relrisk 
+- case load as blue heatmap 
+- MI
+- added "METS AT DX—OTHER (2016+)" to widen met scope.  
+
+TODO 
+- figs as previous heatmaps (heatmap / caseload / preference)
+- focus on these cancer groups 
+    - lung, skin, esophagous, breast, prostate, thyroid, kidney, pancreas, colorectal, stomach, liver
+    - colorectal vs stomach 
+    - prostate vs thyroid 
+    - lung vs skin vs breast 
+- 
+
+
+QUESTIONS
+- is the blood-brain barrier a filter, or is the brain soil itself harder to colonise?
+- what are developmental milestones vs linear risk increases?
+    - eg why does higher T-stage represent higher risk? 
+      is it just a measure of general 'development' ie number of cell divisions? 
+      is T4 a milestone? 
+- According to Jin et al 2020 (MetMap)
+- histology & subtypes
+    - why do 'trophoblastic neoplasms' have unusually low bone & unusually high lung met rate? 
+    - epithelial-mesenchymal transition (EMT)
+        - important for 'epithelial' histological types in general
+        - important for invasion of Basal-like breast cancer (BLBC).
+        - E-cadherin inactivated. (cell-cell adhesion)
+        - N-cadherin and vimentin activated.
+        - 'lobular' types characterised by loss of E-cadherin
+            - https://www.ncbi.nlm.nih.gov/books/NBK164700/
+            - does this suggest that 'lobular' types already in a mesenchymal state?
+    - breast cancer notes:
+        - need more fields from SEER relating to breast subtypes?
+        - five molecular subtypes
+            - luminal subtype A
+            - luminal subtype B
+            - normal breast-like subtype
+            - HER-2 overexpression subtype
+            - basal-like subtype.
+        - BLBC
+            - aggressive molecular subtype of breast cancer
+            - also known as 'triple negative breast cancer' (HR-/HER2-)
+        - nebulous moecular biological characteristics
+
+Hallmarks 
+- Sustaining proliferative signalling
+- Evading growth suppressors
+- Avoiding immune destruction
+- Enabling replicative immortality
+- Tumor-promoting inflammation
+- Activating invasion & metastasis*
+- Inducing or accessing vasculature*
+- Genome instability & mutation
+- Resisting cell death
+- Deregulating cellular metabolism
+- (emerging) unlocking phenotypic plasticity*
+- (emerging) nonmutational epigenetic reprogramming*
+
+TODO [brainmets data]
+- endothelial membrane permeability https://www.ncbi.nlm.nih.gov/books/NBK164700/
+- focus on lung/skin/breast/prostate -> brain 
+- epithelial-mesenchymal transition (EMT)
+    - https://en.wikipedia.org/wiki/Basal-like_carcinoma
+    - EMT -> intravasation -> exit bloodstream (micro-metastases) -> MET (enables clonal outgrowth).
+    - EMT and MET form the initiation and completion of the invasion-metastasis cascade
+    - epithelial cells lose their cell polarity and cell–cell adhesion, 
+      gain migratory and invasive properties to become mesenchymal stem cells.
+    - Mesenchymal stem cells are multipotent stromal cells that can differentiate into a variety of cell types.
+    - EMT markers:        N-cadherin and vimentin
+    - epithelial markers: E-cadherin
+    - Activation of TGF-β, Wnt, and Notch pathways in BLBC leads to the expression of EMT-related transcription factors
+    - breast cancer mainly? 
+- GSEA 
+    - groups need to be defined thoughtfully. 
+    - Burton
+    - hallmarks 
+    - GO signalling pathways
+    - GO metabolic processes 
+    - Reactome?
+
+TODO [seer data]
+- how often does each cancer have secondary but no distant LN? 
+- heatmap neither, local, local+dist. 
+
+- add fields
+    - biomarkers such as E-cadherin?
+- primary -> blood -> secondary 
+    - check whether difference between simple distant_ln==True vs ln_stats=='positive local+distant'
+    - heatmap rather than just tables  (brain, bone, lung, liver, other, any)
+    - groups:
+        - cancer_group
+        - hist_cateogry
+        - hist_type_descr
+        - cancer_group:hist_cateogry
+        - cancer_group:hist_type_descr
+    - remove T1 then repeat the above
+    - remove T1/T2 then repeat the above?
+    - focus on epithelial histologic types - can we see EMT?
+    - also calc stats for cancers which have secondary but no distant LN.
+    - what is the difference epithelial vs non-epithalial types? 
+        - basal metastasis rate vs metastasis rate after blood invasion 
+        - remove unspecified neoplasms
+- can the differences in metastasis rate (metastatic/invasive potential) between cancer groups
+  or histologies be primarily explained by how likely the cancer is to invade bloodstream?
+
+- visualise heatmap data as petal plot instead (radar/polar) 
+    - as per MetMap paper
+    - will produce similar results
+- prove that , and 
+    - only currently measuring brain/bone/lung/liver secondary sites. 
+- Histology 
+- any_met rate vs secondary site specific
+- group cancers into preference:common/intermediate/uncommon and run stats 
+
+- dependence vs independence between variables
+- PCA clustering? cancer_type, want to see that Prostate and Thyroid are similar?
+
+- lung -> lung met???
+- TODO: make sure 'regional_nodes_positive' is correct 
+
+Commons uncommons 
+- clinical vs biological 
+- case load, prevalence, preference
+- case load:
+    - commons: lung, skin, breast, kidney, colorectal
+    - intermediates: [others]
+    - uncommons: leukemias, lymphomas etc 
+- prevalence:
+    - commons: lung, upper digestive organs (including esophagus), respiratory organs, kidney
+    - intermediates: [others]
+    - uncommons: prostate, thyroid, lymphomas, leukemias, lower digestive organs (pancreas?, colorectal, appendix, small intestine, stomach?)
+- preference:
+    - commons: lung, skin, leukemias? 
+    - intermediates: [others]
+    - uncommons: prostate, lower digestive organs (pancreas, colorectal, appendix, small intestine, bile, stomach?) 
+
+Most Informative Features
+    Mutual information 
+    - Groups: cancer_groups, hist_type, cancer_group:hist_types
+    - Features: Tstage, Nstage, Grade, hist_type (only cancer types), Tstage:Nstage
+
+    T-stage more informative than Grade or Nstage 
+    - slide 57 do this but each set of dots/trendline is brain/bone/lung/liver met 
+    - Tstage has 4 levels (T1,T2,T3,T4)
+    - Tstage ramp more extreme (seems exponential)
+    - Tstage ramp more/less extreme depending on cancer_type 
+    - Nstage has two levels
+    - is this trend broken for a specific cancer type? 
+
+Seed soil 
+- Tissue type more important than histologic type
+    - eg lung always more metastatic than any given breast subtype
+    - but, histology important for prostate cancers 
+- Combining tissue+histology does further refine risk 
+- Throw in grade? 
+    - would need to prove that adding grade onto tissue/histtype/tissue:histtype more informative than adding tstage 
+    - this sounds like feature selection 
+- breast
+    - 'breast:epithelial' looks like lung 
+    - subtypes vs hist types
+    - subtypes + hist types
+- Prostate 
+    - PSA and risk 
+    - Prostate and Thyroid are similar in Tstage, Nstage, Grade profiles (2D distance matrices)
+
+Lymph Nodes 
+    LN status 
+    - neither:                  low
+    - locoregional:             low
+    - locoregional + distant:   high
+
+
+
 -----------------
 --- CombiMets ---
 -----------------
@@ -124,9 +345,13 @@ prostate (page 473)
     N0      No regional lymph node metastasis
     N1      Metastasis in regional lymph node(s)
 
+
 ------------
 --- TODO ---
 ------------
+
+case load as 1d Array heatmap color
+
 https://www.aacr.org/blog/2022/01/21/new-dimensions-in-cancer-biology-updated-hallmarks-of-cancer-published/
 ^ 2022 hallmarks of cancer 
 
@@ -136,6 +361,15 @@ https://www.nature.com/articles/s41586-022-04738-6
 https://cancer.sanger.ac.uk/cmc/help
 ^ cancer mutation census data has richer data than previously thought. 
   eg tiers are well explained, sources of data etc, and has hallmarks for each gene.
+
+
+dist matrix (which cancer types have similar profiles?)
+        Ovary   Larynx  Pancreas    Throat
+Ovary   
+Larynx
+Pancreas
+Throat
+
 
 NA values 
 - only 522588 records with 

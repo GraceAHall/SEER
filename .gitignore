@@ -6,4 +6,6 @@ outputs/clustermaps/
 outputs/clustermaps_correlation/
 venv/
 
+*.png
+
 *.pyc

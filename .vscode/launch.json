@@ -12,17 +12,6 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "clean SEER data",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "clean_data.py",
-            "console": "integratedTerminal",
-            "args": [
-                "/home/grace/work/SEER/data/SEER_2010_2020.txt",
-                "/home/grace/work/SEER/data/SEER_2010_2020.clean.test.tsv",
-            ]
-        },
-        {
             "name": "histology: merge_definitions.py",
             "type": "debugpy",
             "request": "launch",
@@ -32,6 +21,28 @@
                 "/home/grace/work/SEER/data/histology/temp1.tsv",
                 "/home/grace/work/SEER/data/histology/temp2.tsv",
                 "/home/grace/work/SEER/data/histology/histcodes.tsv",
+            ]
+        },
+        {
+            "name": "clean SEER case data",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "clean_case_data.py",
+            "console": "integratedTerminal",
+            "args": [
+                "/home/grace/work/SEER/data/SEER_2010_2020.txt",
+                "/home/grace/work/SEER/data/SEER_2010_2020.clean.test.tsv",
+            ]
+        },
+        {
+            "name": "clean SEER survival data",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "clean_survival_data.py",
+            "console": "integratedTerminal",
+            "args": [
+                "/home/grace/work/SEER/data/survival/pancancer_brainmetTrue_2010_2014.txt",
+                "/home/grace/work/SEER/data/survival/pancancer_brainmetTrue_2010_2014.clean.tsv",
             ]
         },
     ]

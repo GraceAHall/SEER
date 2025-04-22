@@ -1,0 +1,26 @@
+
+For testis, moderately low rate for germ cell neoplasms, but very high rate for trophoblastic neoplasms: 
+
+    brain_met cancer_group        feature                                     value  YES     NO
+    0               Testis  hist_cateogry              adenomas and adenocarcinomas    1     39
+    1               Testis  hist_cateogry                       blood vessel tumors    0      3
+    2               Testis  hist_cateogry       complex mixed and stromal neoplasms    0      3
+    3               Testis  hist_cateogry     cystic, mucinous and serous neoplasms    0      6
+    4               Testis  hist_cateogry                 epithelial neoplasms, NOS    5     59
+    5               Testis  hist_cateogry                     fibromatous neoplasms    0      1
+    6               Testis  hist_cateogry                       germ cell neoplasms  146  25006
+    7               Testis  hist_cateogry                                   gliomas    0      5
+    8               Testis  hist_cateogry                      lipomatous neoplasms    0     69
+    9               Testis  hist_cateogry  miscellaneous bone tumors (C40._, C41._)    0      2
+    10              Testis  hist_cateogry                      miscellaneous tumors    0      1
+    11              Testis  hist_cateogry                       myomatous neoplasms    2    110
+    12              Testis  hist_cateogry                      myxomatous neoplasms    0      1
+    13              Testis  hist_cateogry            neuroepitheliomatous neoplasms    0      1
+    14              Testis  hist_cateogry       osseous and chondromatous neoplasms    0      1
+    15              Testis  hist_cateogry          paragangliomas and glumus tumors    0      1
+    16              Testis  hist_cateogry      soft tissue tumors and sarcomas, NOS    1     10
+    17              Testis  hist_cateogry             specialized gonadal neoplasms    0    168
+    18              Testis  hist_cateogry                   squamous cell neoplasms    0      2
+    19              Testis  hist_cateogry                   synovial-like neoplasms    0      1
+    20              Testis  hist_cateogry                   trophoblastic neoplasms   82    439
+    21              Testis  hist_cateogry                     unspecified neoplasms    7     84

@@ -106,6 +106,7 @@ def gen_record(line: str) -> SeerRecord:
         bone_met = get_bone_met(lsplit),
         liver_met = get_liver_met(lsplit), 
         lung_met = get_lung_met(lsplit),
+        other_met = get_other_met(lsplit),
         distant_ln = get_distant_ln(lsplit),
         breast_subtype = get_breast_subtype(lsplit),
         psa = get_psa(lsplit),
@@ -519,6 +520,16 @@ def get_lung_met(lsplit: list[str]) -> Optional[bool]:
     if lsplit[33] == 'No':
         return False
     return None
+
+def get_other_met(lsplit: list[str]) -> Optional[bool]:
+    if lsplit[37].strip() == 'Yes; distant mets in known site(s) other than bone, brain, liver, lung, dist LN':
+        return True
+    elif lsplit[37].strip() == 'generalized metastases such as carinomatosis':
+        return True
+    elif lsplit[37].strip() == 'None; no other metastases':
+        return False
+    else:
+        return None
 
 def get_distant_ln(lsplit: list[str]) -> Optional[bool]:
     """

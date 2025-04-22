@@ -6,18 +6,6 @@ from functools import cached_property
 from util_enums import Grade, RegionalNodes, Behavior, Source
 from util_consts import SEP_CHAR, ISEP_CHAR, NA_CHAR
 
-### SETTINGS FOR NOTEBOOKS ###
-@dataclass 
-class Settings:
-    RATE_FIELD = 'prevalence (%)'
-    NORM_FIELD = 'norm'
-    NORM_METH = 'sum'
-    COMPOUND_FEATURE = 'derived_feature'
-    COMPOUND_GROUP = 'derived_group'
-    THRESH_RECORDS = 1000
-    THRESH_POSITIVE = 3
-
-
 ### RECORD LEVEL ###
 
 @dataclass
@@ -53,6 +41,7 @@ class SeerRecord:
     bone_met: Optional[bool]
     lung_met: Optional[bool]
     liver_met: Optional[bool]
+    other_met: Optional[bool]
     distant_ln: Optional[bool]
 
     def tostr(self) -> str:
