@@ -2,7 +2,7 @@
 from __future__ import annotations
 from typing import Optional, Tuple
 from dataclasses import fields
-import re 
+import re
 
 from util_classes import SeerRecord
 from util_enums import Grade, Behavior, RegionalNodes, Source
@@ -282,8 +282,6 @@ def _binary_search_primary(code: int, ranges: list) -> Optional[str]:
         return _binary_search_primary(code, ranges[mid:])
     else:
         return _binary_search_primary(code, ranges[:mid])
-    
-
     
 def get_t_stage_raw(lsplit: list[str]) -> Tuple[str|None, str]:
     # ajcc (2004-2015)

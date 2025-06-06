@@ -1,0 +1,65 @@
+
+https://www.youtube.com/watch?v=NW28tkp6TZk
+
+------------------
+---- FIGURE 1 ----
+------------------
+
+Details 
+- Cases, prevalence, preference (cancer group)
+
+TODO
+- Make rightmost column look less shit
+
+------------------
+---- FIGURE 2 ----
+------------------
+
+Details
+- Cancer groups / hist types with similar behaviour
+- Behaviour: General metastasis risk, brain metastasis risk, <-diff
+- Fields: brain_met, lung_met, liver_met, bone_met, age, hist_category, TSTAGE_STD, NSTAGE_STD, GSTAGE_STD, GRADE_STD, regional_nodes, distant_ln_met
+
+TODO 
+- Clustermaps (make pretty using dot sizes etc)
+
+------------------
+---- FIGURE 3 ----
+------------------
+
+Details
+- ML models, performance metrics, key insights
+- Models
+    - Decision Tree
+    - Linear model 
+    - Association Rule Learning
+    - Neural Network
+    - Naive Bayes (optional)
+
+TODO
+- Categorical <-> discrete <-> continuous variable conversion
+- Pan-cancer model 
+- Individual models per cancer group   
+
+------------------
+---- FIGURE 4 ----
+------------------
+
+Details
+- Nomagram
+- Panel A: Summary of findings (high risk individual and multivariate features) 
+- Panel B: Pruned decision tree for clinical use.
+
+TODO 
+- use sklearn feature selection to prune? 
+  https://scikit-learn.org/stable/modules/feature_selection.html
+
+------------------
+---- FIGURE 5 ----
+------------------
+
+Inherent bias: screening
+- If we adjust for rates of Nstage/Tstage/local LN met/distant ln met (in say prostate -> lung), 
+  does this explain the prevalence of brain met? 
+
+

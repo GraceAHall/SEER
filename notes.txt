@@ -1,12 +1,247 @@
 
+Universal 
+- patient_id
+- record_number
+- behaviour
+- age 
+- sex 
+- COD 
+- diagnosis_year
+- death_year 
+- survival_months 
+- cancer_type 
+- cancer_group
+- primary_type 
+- primary_group
+- hist_type 
+- hist_group
+- TSTAGE_STD 
+- NSTAGE_STD 
+- GSTAGE_STD 
+- GRADE_STD 
+- regional_nodes
+- [met fields]
 
--------------
---- PAPER ---
--------------
+Vulva
+- LDH_pretreatment
+- breslow_thick
+- mitotic_rate_melanoma
+- ulceration
+
+Breast
+- HER2_type
+- HER2_status
+
+Ovary
+- ovarian_CA125
+
+Prostate
+- PSA
+- gleason
+
+Non-Hodgkin Lymphoma
+- B_symptoms
+- peripheral_blood_involvement
+
+Uterus
+- peritoneal_cytology
+
+Skin
+- LDH_pretreatment
+- breslow_thick
+- mitotic_rate_melanoma
+- perineural_invasion
+- ulceration
+
+Colorectal
+- CEA_pretreat
+- perineural_invasion
+- tumor_deposits
+
+Hodgkin Lymphoma
+- B_symptoms
+
+Lung and Bronchus
+- pleural_invasion
+
+Eye and Orbit
+- perineural_invasion
+
+Kidney and Renal Pelvis
+- adrenal_involvement
+- major_vein_involvement
+- capsule_invasion
+
+Brain
+- chr19q_loh
+- chr1p_loh
+
+Cranial Nerves Other Nervous System
+- chr19q_loh
+- chr1p_loh
+
+Intrahepatic Bile Duct
+- fibrosis_score
+
+Mesothelioma
+- ovarian_CA125
+- pleural_effusion
+
+Liver
+- AFP_pretreat_category
+- fibrosis_score
+
+Appendix (carcinoid)
+- CEA_pretreat
+
+Peritoneum, Omentum and Mesentery
+- ovarian_CA125
+
+Appendix (carcinoma)
+- CEA_pretreat
+
+Other Digestive Organs
+- ovarian_CA125
+
+Testis
+- AFP_post_orchiectomy
+- hGC_post_orchiectomy_elevation
+- LDH_post_orchiectomy_elevation
+
+Penis
+- LDH_pretreatment
+- breslow_thick
+- mitotic_rate_melanoma
+- ulceration
+
+
+
+
+
+[Variables]
+Patient ID
+Record number recode
+Sex
+Age recode with <1 year olds and 90+
+Year of diagnosis
+Year of death recode
+Site recode ICD-O-3/WHO 2008
+Behavior code ICD-O-3
+Derived AJCC T, 6th ed (2004-2015)
+Derived AJCC N, 6th ed (2004-2015)
+Derived AJCC T, 7th ed (2010-2015)
+Derived AJCC N, 7th ed (2010-2015)
+Derived SEER Combined T (2016-2017)
+Derived SEER Combined N (2016-2017)
+Derived EOD 2018 T (2018+)
+Derived EOD 2018 N (2018+)
+Derived AJCC Stage Group, 6th ed (2004-2015)
+Derived AJCC Stage Group, 7th ed (2010-2015)
+Derived SEER Cmb Stg Grp (2016-2017)
+Derived EOD 2018 Stage Group (2018+)
+Total number of in situ/malignant tumors for patient
+Total number of benign/borderline tumors for patient
+Histologic Type ICD-O-3
+Regional nodes examined (1988+)
+Regional nodes positive (1988+)
+Grade Recode (thru 2017)
+Grade Clinical (2018+)
+Grade Pathological (2018+)
+Primary Site
+Histology recode - broad groupings
+SEER Combined Mets at DX-brain (2010+)
+SEER Combined Mets at DX-bone (2010+)
+SEER Combined Mets at DX-liver (2010+)
+SEER Combined Mets at DX-lung (2010+)
+Mets at DX-Distant LN (2016+)
+Mets at DX-Other (2016+)
+Breast Subtype (2010+)
+Year of follow-up recode
+AFP Post-Orchiectomy Lab Value Recode (2010+)
+AFP Pretreatment Interpretation Recode (2010+)
+B Symptoms Recode (2010+)
+Breslow Thickness Recode (2010+)
+CA-125 Pretreatment Interpretation Recode (2010+)
+CEA Pretreatment Interpretation Recode (2010+)
+Chromosome 19q: Loss of Heterozygosity (LOH) Recode (2010+)
+Chromosome 1p: Loss of Heterozygosity (LOH) Recode (2010+)
+Fibrosis Score Recode (2010+)
+Gestational Trophoblastic Prognostic Scoring Index Recode (2010+)
+Gleason Score Clinical Recode (2010+)
+Gleason Score Pathological Recode (2010+)
+Invasion Beyond Capsule Recode (2010+)
+Ipsilateral Adrenal Gland Involvement Recode (2010+)
+hCG Post-Orchiectomy Range Recode (2010+)
+LDH Post-Orchiectomy Range Recode (2010+)
+LDH Pretreatment Level Recode (2010+)
+Major Vein Involvement Recode (2010+)
+Mitotic Rate Melanoma Recode (2010+)
+Perineural Invasion Recode (2010+)
+Peripheral Blood Involvement Recode (2010+)
+Peritoneal Cytology Recode (2010+)
+PSA Lab Value Recode (2010+)
+Pleural Effusion Recode (2010+)
+Visceral and Parietal Pleural Invasion Recode (2010+)
+Ulceration Recode (2010+)
+Tumor Deposits Recode (2010+)
+Months from diagnosis to treatment
+Survival months
+COD to site recode
+
+RX Summ--Systemic/Sur Seq (2007+)
+RX Summ--Surg Prim Site (1998+)
+RX Summ--Scope Reg LN Sur (2003+)
+RX Summ--Surg Oth Reg/Dis (2003+)
+RX Summ--Surg/Rad Seq
+Chemotherapy recode (yes, no/unk)
+Radiation recode
+Derived HER2 Recode (2010+)
+
+
+
+
+
+
 Journal: JCO / Lancet
-figure 1: log odds ratio -> relative risk (with error bars)
-figure 1: add secondary site 'preference'
 
+---------------
+--- FIGURES ---
+---------------
+
+figure 1:
+- Flowchart
+- Communicates:
+    1. How the data was obtained 
+    2. The filtering process 
+
+figure 2:
+- Summary stats  
+    - BM cases, [total primary cases?],  BM prevalence, BM relative risk given metastasis
+- Communicates:
+    1. Difference between clinical case load, and likelihood of brain met across different conditions 
+    2. 'Common' is Lung, and additionally skin if metastatic disease. 
+- Should this be broken into cell types? 
+
+figure 3:
+- Informative features of brain metastasis risk 
+    - Tstage, Nstage, Grade, Lymph node status, hist type, + extras (eg breast HER2+/-)
+    - Panel A - Probably a heatmap lol fuk u Chris 
+    - Panel B - Clustermap which cancers (& hist types?) behave similarly in terms of BM risk features
+- Communicates: 
+    1. Informative features of brain metastasis
+    2. Hist type & primary cancer are most important features.
+- Should be normalised against general metastasis?
+
+figure 4:
+- Classifiers 
+    - Linear Model (no independence assumption)
+    - Naive Bayes (independence assumption)
+    - Decision Tree / random forest 
+    - Neural Net (probably best performance) 
+- Communicates: 
+    1. Whether clinical data is sufficient to accurately predict BM likelihood. 
+- Build each model for all data 
+- Build each model independently for each primary cancer (include hist type)
 
 ----------------
 --- WRITE UP ---

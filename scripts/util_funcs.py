@@ -1,16 +1,15 @@
-
-from typing import Optional, Tuple
-
-import pandas as pd
-from util_consts import ISEP_CHAR
-import settings as s
 import re 
-import numpy as np
 import math
-from scipy.stats.contingency import odds_ratio, relative_risk
-
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+from typing import Optional, Tuple
+from scipy.stats.contingency import odds_ratio, relative_risk
+
+from util_consts import ISEP_CHAR
+import settings as s
 
 HISTTYPES_PATH = '/home/grace/work/SEER/data/histology/histcodes.tsv'
 
@@ -33,13 +32,13 @@ def format_cancer_subtypes(df: pd.DataFrame) -> pd.DataFrame:
     for field in ['cancer_type', 'cancer_group']:
         ### APPENDIX ###
         mask = df[field] == 'Appendix'
-        df.loc[mask, field] = df.loc[mask, 'hist_type_descr'].apply(_format_appendix_subtype)
+        df.loc[mask, field] = df.loc[mask, 'hist_type'].apply(_format_appendix_subtype)
         
         ### CORPUS UTERI ###
         mask = df[field] == 'Corpus Uteri'
-        df.loc[mask, field] = df.loc[mask, 'hist_type_descr'].apply(_format_corpus_uteri_subtype)
+        df.loc[mask, field] = df.loc[mask, 'hist_type'].apply(_format_corpus_uteri_subtype)
     
-    return df 
+    return df.copy()
 
 
 def format_ln_status(df: pd.DataFrame, basis: str) -> pd.DataFrame:
@@ -120,25 +119,25 @@ def format_regional_nodes_bins(df: pd.DataFrame) -> pd.DataFrame:
     df.loc[df['regnodes_prop_bin']=='(-0.001, 0.25]', 'regnodes_prop_bin'] = '(0.00, 0.25]'
     return df 
 
-
 def do_basic_filtering(df: pd.DataFrame, filter_mets: Optional[str]=None) -> pd.DataFrame:
-    print(f"Reginning records: {df.shape[0]}")
-    print('Removing records not in range (2010, 2020)...', end='\r')
-    irecords = df.shape[0]
+    print(f"Beginning")
+    print(f"- {df['patient_id'].nunique()} patients, {df.shape[0]} records.")
+    
     df = df.loc[df['diagnosis_year'] >= 2010]
     df = df.loc[df['diagnosis_year'] <= 2020]
-    print(f"Removing records not in range (2010, 2020)... removed {irecords - df.shape[0]} records")
+    print()
+    print(f"Filtered records not in range (2010, 2020)")
+    print(f"- {df['patient_id'].nunique()} patients, {df.shape[0]} records.")
     
-    print("Removing records with non 'MALIGNANT' behavior...", end='\r')
-    irecords = df.shape[0]
-    df = df[df['behavior']=='MALIGNANT']
-    print(f"Removing records with non 'MALIGNANT' behavior... removed {irecords - df.shape[0]} records")
+    # print("Removing records with non 'MALIGNANT' behavior...", end='\r')
+    # irecords = df.shape[0]
+    # df = df[df['behavior']=='MALIGNANT']
+    # print(f"Removing records with non 'MALIGNANT' behavior... removed {irecords - df.shape[0]} records")
 
-    print('Handling patients with multiple records of same cancer_type...', end='\r')
-    irecords = df.shape[0]
-    # df = df[~df.duplicated(subset=['patient_id', 'cancer_type', 'hist_cateogry'])]
     df = df[~df.duplicated(subset=['patient_id', 'cancer_type'])]
-    print(f"Handling patients with multiple records of same cancer_type... removed {irecords - df.shape[0]} records")
+    print()
+    print(f"Removed patients with multiple records of same cancer_type.")
+    print(f"- {df['patient_id'].nunique()} patients, {df.shape[0]} records.")
     
     if filter_mets == 'all':
         MET_FIELDS = ['brain_met', 'bone_met', 'lung_met', 'liver_met', 'other_met']
@@ -154,8 +153,7 @@ def do_basic_filtering(df: pd.DataFrame, filter_mets: Optional[str]=None) -> pd.
         df = df.dropna(subset=['brain_met'])
         print(f'- removed {irecords - df.shape[0]} records')
 
-    print(f'\nFinal records: {df.shape[0]}, patients: {len(df.patient_id.unique())}')
-    return df
+    return df.copy()
 
 def select_valid(
     df: pd.DataFrame, 
@@ -198,13 +196,14 @@ def remove_identical_primary_secondary_cases(df: pd.DataFrame) -> pd.DataFrame:
         'liver_met': ['Liver'], 
     }
 
-    print('Removing MET records where primary tissue is identical to secondary tissue')
-    irecords = df.shape[0]
     for met, tissues in MET_MAP.items():
         mask = (df[met]==True) & (df['cancer_type'].isin(tissues))
         df = df[~mask]
-    print(f'- removed {irecords - df.shape[0]} records')
-    return df  
+    
+    print()
+    print(f"Removed MET records where primary tissue is identical to secondary tissue.")
+    print(f"- {df['patient_id'].nunique()} patients, {df.shape[0]} records.")
+    return df.copy()
 
 def do_basic_formatting(df: pd.DataFrame) -> pd.DataFrame:
     # mets: any_met

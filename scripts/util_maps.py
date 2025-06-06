@@ -1,5 +1,4 @@
 
-
 from util_enums import Grade
 
 
@@ -66,6 +65,7 @@ TSTAGE_EOD_AJCC_MAP = {
     'T3d': 'T4',
     'T3e': 'T4',
     'T4e': 'T4',
+    'Ta': 'Tis',
     'Tis(DCIS)': 'Tis',
     'Tis(LAMN)': 'Tis',
     'Tis(Paget)': 'Tis',
@@ -185,32 +185,31 @@ GSTAGE_EOD_AJCC_MAP = {
 #########
 
 GRADE_SEER_STD_MAP = {
-    'Well differentiated; Grade I': Grade.G1,
-    'Moderately differentiated; Grade II': Grade.G2,
-    'Poorly differentiated; Grade III': Grade.G3,
-    'Undifferentiated; anaplastic; Grade IV': Grade.G4,
-    'T-cell': Grade.T_CELL,
-    'B-cell; pre-B; B-precursor': Grade.B_CELL,
-    'Null cell; non T-non B': Grade.NULL_CELL,
-    'NK cell; natural killer cell (1995+)': Grade.NK_CELL,
+    'Well differentiated; Grade I': 'G1',
+    'Moderately differentiated; Grade II': 'G2',
+    'Poorly differentiated; Grade III': 'G3',
+    'Undifferentiated; anaplastic; Grade IV': 'G4',
+    'T-cell': 'T_CELL',
+    'B-cell; pre-B; B-precursor': 'B_CELL',
+    'Null cell; non T-non B': 'NULL_CELL',
+    'NK cell; natural killer cell (1995+)': 'NK_CELL',
 }
 
 GRADE_NAACCR_STD_MAP = {
-    '1': Grade.G1,
-    '2': Grade.G2,
-    '3': Grade.G3,
-    '4': Grade.G4,
-    '5': Grade.T_CELL,
-    '6': Grade.B_CELL, 
-    '7': Grade.NULL_CELL,
-    '8': Grade.NK_CELL,       
-    '9': Grade.NA,
-    'A': Grade.G1,
-    'B': Grade.G2,
-    'C': Grade.G3,
-    'D': Grade.G4,
-    'L': Grade.G2,
-    'H': Grade.G4,
+    '1': 'G1',
+    '2': 'G2',
+    '3': 'G3',
+    '4': 'G4',
+    '5': 'T_CELL',
+    '6': 'B_CELL', 
+    '7': 'NULL_CELL',
+    '8': 'NK_CELL',       
+    'A': 'G1',
+    'B': 'G2',
+    'C': 'G3',
+    'D': 'G4',
+    'L': 'G2',
+    'H': 'G4',
 }
 
 
