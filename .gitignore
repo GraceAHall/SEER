@@ -1,11 +1,11 @@
 
 data/
+outputs/
 outputs/*.txt
 outputs/*.png
 outputs/clustermaps/
 outputs/clustermaps_correlation/
+
 venv/
-
 *.png
-
 *.pyc

@@ -4,9 +4,352 @@ import pandas as pd
 from typing import Tuple, Any
 
 
-##################
-### FORMATTING ###
-##################
+
+
+#############
+### STATS ###
+#############
+
+# def tendency(df: pd.DataFrame, )
+
+def relrisk(df: pd.DataFrame, grouping: str|None, predictor: str, response: str, baseval: str, banned: list[str]|None=None) -> pd.DataFrame:
+    counts = df.groupby([grouping, predictor])[response].value_counts().unstack().fillna(0).astype(int).reset_index()
+    counts.columns = [str(x) for x in counts.columns]
+    if banned is not None:
+        counts = counts[~counts[predictor].isin(banned)]
+    counts['prop'] = counts['True'] / (counts['True']+counts['False']) * 100
+    baseline_cases = counts[counts[predictor]==baseval].set_index(grouping)['True'].to_dict()
+    baseline_props = counts[counts[predictor]==baseval].set_index(grouping)['prop'].to_dict()
+    counts['norm'] = counts['prop'] / counts[grouping].map(baseline_props)
+    valid = set([k for k, v in baseline_cases.items() if v>=5])
+    counts = counts[counts[grouping].isin(valid)]
+    return counts 
+
+def prevalence(df: pd.DataFrame, predictor: str, response: str) -> pd.DataFrame: 
+    counts = df.sort_values(response).groupby(predictor)[response].value_counts().unstack().fillna(0).astype(int).copy()
+    counts.columns = [str(x) for x in counts.columns]
+    counts['records'] = counts['True'] + counts['False']
+    counts['stat'] = (counts['True'] / counts['records']) * 100
+    return counts
+
+
+#################################
+### DATA LOAD & PREPROCESSING ###
+#################################
+
+NAMELUT = {
+
+    # pure categorical
+    'cancer_group': 'cancer_group_CAT',
+    'hist_group': 'hist_group_CAT',
+    'HER2_type': 'HER2_type_CAT',
+    'sex': 'sex_CAT',
+
+    # pure bool
+    'local_ln_met': 'local_ln_met_BOOL',
+    'distant_ln_met': 'distant_ln_met_BOOL',
+    'brain_met': 'brain_met_BOOL',
+    'bone_met': 'bone_met_BOOL',
+    'liver_met': 'liver_met_BOOL',
+    'lung_met': 'lung_met_BOOL',
+    'other_met': 'other_met_BOOL',
+    'any_met': 'any_met_BOOL',
+    'ulceration': 'ulceration_BOOL',
+    'perineural_invasion': 'perineural_invasion_BOOL',
+    'adrenal_involvement': 'adrenal_involvement_BOOL',
+    'major_vein_involvement': 'major_vein_involvement_BOOL',
+    'capsule_invasion': 'capsule_invasion_BOOL',
+    'chr19q_loh': 'chr19q_loh_BOOL',
+    'chr1p_loh': 'chr1p_loh_BOOL',
+    'pleural_effusion': 'pleural_effusion_BOOL',
+    'B_symptoms': 'B_symptoms_BOOL',
+
+    # categorical (mappable to NUM)
+    'TSTAGE_STD': 'TSTAGE_CAT',
+    'NSTAGE_STD': 'NSTAGE_CAT',
+    'GSTAGE_STD': 'GSTAGE_CAT',
+    'GRADE_STD': 'GRADE_CAT',
+    'hGC_post_orchiectomy_elevation': 'hGC_elevation_post_orchiectomy_CAT',
+    'LDH_post_orchiectomy_elevation': 'LDH_elevation_post_orchiectomy_CAT',
+    'HER2_status': 'HER2_status_CAT',
+    'peripheral_blood_involvement': 'peripheral_blood_involvement_CAT',
+    'peritoneal_cytology': 'peritoneal_cytology_CAT',
+    'pleural_invasion': 'pleural_invasion_CAT',
+    
+    # categorical (mappable to BOOL)
+    'LDH_pretreatment': 'LDH_elevated_pretreat_CAT',
+    'CEA_pretreat': 'CEA_elevated_pretreat_CAT',
+    'ovarian_CA125': 'CA125_elevated_CAT',
+    'AFP_pretreat_category': 'AFP_elevated_pretreat_CAT',
+    'fibrosis_score': 'fibrosis_score_CAT',
+    
+    # continuous (always mappable to CAT and BOOL)
+    'breslow_thick': 'breslow_thick_NUM',
+    'mitotic_rate_melanoma': 'mitotic_rate_NUM',
+    'PSA': 'PSA_NUM',
+    'gleason': 'gleason_NUM',
+    'tumor_deposits': 'tumor_deposits_NUM',
+    'AFP_post_orchiectomy': 'AFP_post_orchiectomy_NUM',
+    
+}
+
+def load_seer_data(filepath: str) -> pd.DataFrame:
+    df = pd.read_csv(filepath, sep='\t', header=0)
+    df = _load_seer_data_filtering(df)
+    df = _load_seer_data_redefine_fields(df)
+    return df 
+
+def _load_seer_data_filtering(df: pd.DataFrame) -> pd.DataFrame:
+    cgroup_blacklist = ['Brain', 'Miscellaneous']
+    hgroup_blacklist = ['unspecified neoplasms']
+    
+    print(f"Basic filtering")
+    fpats, frecs = df['patient_id'].nunique(), df.shape[0]
+    print(f"- Beginning: {fpats} patients, {frecs} records.")
+    
+    # banned cancer groups
+    ipats, irecs = fpats, frecs
+    df = df[~df['cancer_group'].isin(cgroup_blacklist)]
+    fpats, frecs = df['patient_id'].nunique(), df.shape[0]
+    print(f"- Removed {ipats-fpats} patients, {irecs-frecs} records where 'cancer_group' in {cgroup_blacklist}.")
+
+    # banned histological groups
+    ipats, irecs = fpats, frecs
+    df = df[~df['hist_group'].isin(hgroup_blacklist)]
+    fpats, frecs = df['patient_id'].nunique(), df.shape[0]
+    print(f"- Removed {ipats-fpats} patients, {irecs-frecs} records where 'hist_group' in {hgroup_blacklist}.")
+
+    # record year range
+    ipats, irecs = fpats, frecs
+    df = df.loc[df['diagnosis_year'] >= 2010]
+    df = df.loc[df['diagnosis_year'] <= 2020]
+    fpats, frecs = df['patient_id'].nunique(), df.shape[0]
+    print(f"- Removed {ipats-fpats} patients, {irecs-frecs} records where 'diagnosis_year' not in range [2010, 2020].")
+ 
+    # duplicate patient records 
+    ipats, irecs = fpats, frecs
+    df = df[~df.duplicated('patient_id', keep=False)]
+    fpats, frecs = df['patient_id'].nunique(), df.shape[0]
+    print(f"- Removed {ipats-fpats} patients, {irecs-frecs} records with duplicated patient_id.")
+    # ipats, irecs = fpats, frecs
+    # df = df[~df.duplicated(subset=['patient_id', 'cancer_type'])]
+    # fpats, frecs = df['patient_id'].nunique(), df.shape[0]
+    # print(f"- Removed {ipats-fpats} patients, {irecs-frecs} records with duplicated patient_id & cancer_type.")
+
+    # primary marked as metastasis
+    ipats, irecs = fpats, frecs
+    MET_MAP = {
+        'brain_met': ['Brain'], 
+        'bone_met': ['Bones and Joints'], 
+        'lung_met': ['Lung and Bronchus'],
+        'liver_met': ['Liver'], 
+    }
+    for met, tissues in MET_MAP.items():
+        mask = (df[met]==True) & (df['cancer_type'].isin(tissues))
+        df = df[~mask]
+    fpats, frecs = df['patient_id'].nunique(), df.shape[0]
+    print(f"- Removed {ipats-fpats} patients, {irecs-frecs} records where primary cancer is marked as metastasis")
+    
+    print(f"- Final: {fpats} patients, {frecs} records.")
+    return df.copy()
+
+def _load_seer_data_redefine_fields(df: pd.DataFrame) -> pd.DataFrame:
+    # redefine any_met
+    df['any_met'] = df[['brain_met', 'bone_met', 'lung_met', 'liver_met', 'other_met']].any(axis=1)
+    
+    # local ln status
+    df = format_local_ln_met(df)
+
+    # age categorical -> float
+    mask = df['age'].notna()
+    df.loc[mask, 'age_NUM'] = df.loc[mask, 'age'].apply(cast_str_to_float_age)
+
+    # age float -> categorical (rebinning)
+    df.loc[mask, 'age_CAT'] = df.loc[mask, 'age_NUM'].apply(cast_float_age_to_bins, binwidth=10)
+    
+    # rename columns 
+    df = df.rename(columns=NAMELUT)
+
+    return df.copy()
+
+def remove_all_NA_fields(df: pd.DataFrame) -> pd.DataFrame:
+    # remove fields with all NA values
+    all_na_fields = []
+    for field in df.columns:
+        if df[field].notna().sum() == 0:
+            print(f"- [FAIL] {field}")
+            all_na_fields.append(field)
+    df = df.drop(all_na_fields, axis=1)
+
+    return df.copy()
+
+def select_categorical_feature_values(
+    df: pd.DataFrame, 
+    predictor: str,
+    response: str,
+    min_cases_total: int|None=None,
+    min_cases_response: int|None=None,
+    top: int|None=None,
+    ) -> list:
+    c_counts = pd.DataFrame(index=df[predictor].unique())
+    c_counts['total'] = df[predictor].value_counts()
+    c_counts[response] = df[df[response]==True][predictor].value_counts()
+    c_counts = c_counts.fillna(0).astype(int)
+    c_counts = c_counts.sort_values(response, ascending=False)
+
+    if min_cases_total and min_cases_response:
+        c_counts['valid'] = (c_counts['total']>=min_cases_total) & (c_counts[response]>=min_cases_response)
+    elif min_cases_total:
+        c_counts['valid'] = c_counts['total']>=min_cases_total
+    elif min_cases_response:
+        c_counts['valid'] = c_counts[response]>=min_cases_response
+    else:
+        raise ValueError('either min_cases_total or min_cases_brainmet cannot be None. ')
+
+    if top: 
+        c_counts['valid'] = (c_counts['valid']) & (c_counts.index.isin(c_counts.head(top).index.to_list()))
+    
+    print()
+    if c_counts.shape[0] < 30:
+        print(c_counts.head())
+    else:
+        print(c_counts.head(20))
+        print(c_counts.tail(10))
+    
+    return sorted(c_counts[c_counts['valid']==True].index.to_list())
+    
+
+def subset_histology_groups(df: pd.DataFrame, min_cases_total: int|None=None, min_cases_brainmet: int|None=None) -> pd.DataFrame:
+    assert min_cases_total or min_cases_brainmet
+    field = 'hist_group_CAT' if 'hist_group_CAT' in df.columns else 'hist_group'
+    response = 'brain_met_BOOL' if 'brain_met_BOOL' in df.columns else 'brain_met'
+    c_counts = pd.DataFrame(index=df[field].unique())
+    c_counts['total'] = df[field].value_counts()
+    c_counts[response] = df[df[response]==True][field].value_counts()
+    c_counts['valid'] = (c_counts['total']>=min_cases_total) & (c_counts[response]>=min_cases_brainmet)
+    c_counts = c_counts.sort_values(response, ascending=False)
+    valid = sorted(c_counts[c_counts['valid']==True].index.to_list())
+    table = df[df[field].isin(valid)].copy()
+    print()
+    print(c_counts)
+    return table
+
+def format_predictors(df: pd.DataFrame) -> pd.DataFrame:
+    df = format_categorical_to_numeric(df)
+    df = format_categorical_to_bool(df)
+    df = format_continuous_to_numeric_bool(df)
+    df = format_bool_to_numeric(df)
+    formatting_report_fields(df)
+    return df
+
+def format_categorical_to_numeric(df: pd.DataFrame) -> pd.DataFrame:
+    # functions
+    funclut = {
+        'TSTAGE_CAT': cast_tstage_to_float,
+        'NSTAGE_CAT': cast_nstage_to_float,
+        'GSTAGE_CAT': cast_gstage_to_float,
+        'GRADE_CAT': cast_grade_to_float,
+        'hGC_elevation_post_orchiectomy_CAT': cast_hGC_to_float,
+        'LDH_elevation_post_orchiectomy_CAT': cast_LDH_to_float,
+        'HER2_status_CAT': cast_HER2_to_float,
+        'peripheral_blood_involvement_CAT': cast_peripheral_blood_to_float,
+        'peritoneal_cytology_CAT': cast_peritoneal_cytology_to_float,
+        'pleural_invasion_CAT': cast_pleural_invasion_to_float,
+    }
+
+    # apply
+    for field, func in funclut.items():
+        if field not in df.columns:
+            continue 
+        newfield = field.replace('_CAT', '_NUM')
+        if field == 'GRADE_CAT':
+            mask = df['GRADE_CAT'].isin(['G1', 'G2', 'G3', 'G4'])
+        else:
+            mask = df[field].notna()
+        df.loc[mask, newfield] = df.loc[mask, field].apply(func)
+    
+    return df.copy()
+
+def format_categorical_to_bool(df: pd.DataFrame) -> pd.DataFrame:
+    # functions
+    funclut = {
+        'LDH_elevated_pretreat_CAT': cast_2level_elevation_to_bool,
+        'CEA_elevated_pretreat_CAT': cast_2level_elevation_to_bool,
+        'AFP_elevated_pretreat_CAT': cast_2level_elevation_to_bool,
+        'CA125_elevated_CAT': cast_2level_elevation_to_bool,
+        'fibrosis_score_CAT': cast_fibrosis_to_bool,
+    }
+
+    # apply
+    for field, func in funclut.items():
+        if field not in df.columns:
+            continue 
+        mask = df[field].notna()
+        newfield = field.replace('_CAT', '_BOOL')
+        df.loc[mask, newfield] = df.loc[mask, field].apply(func)
+    
+    return df.copy()
+
+def format_continuous_to_numeric_bool(df: pd.DataFrame) -> pd.DataFrame:
+    # continuous (always mappable to CAT and BOOL)
+    fields = [
+        'breslow_thick_NUM',
+        'mitotic_rate_NUM',
+        'PSA_NUM',
+        'gleason_NUM',
+        'tumor_deposits_NUM',
+        'AFP_post_orchiectomy_NUM',
+    ]
+
+    # mapping to 3 levels (categorical)
+    for field in fields:
+        if field not in df.columns:
+            continue 
+        newfield = field.replace('_NUM', '_CAT')
+        mask = df[field].notna()
+        df.loc[mask, newfield] = categorise(df.loc[mask, field], preferred_q=3)
+        # sns.histplot(df, x=newfield)
+        # plt.show()
+
+    # mapping to 2 levels (high bool)
+    for field in fields:
+        if field not in df.columns:
+            continue 
+        newfield = field.replace('_NUM', '_BOOL')
+        mask = df[field].notna()
+        df.loc[mask, f"{newfield}_tmp"] = categorise(df.loc[mask, field], preferred_q=2)
+        df.loc[mask, newfield] = df.loc[mask, f"{newfield}_tmp"].apply(lambda x: False if 'low' in x else True)
+        df = df.drop(f"{newfield}_tmp", axis=1)
+    
+    return df.copy()
+
+def format_bool_to_numeric(df: pd.DataFrame) -> pd.DataFrame:
+    # Casting uncasted BOOL to NUM
+    boolfields = [col for col in df.columns if col.endswith('_BOOL')]
+    numfields = [col for col in df.columns if col.endswith('_NUM')]
+    for field in boolfields:
+        if field.replace('_BOOL', '_NUM') in numfields:
+            print(f"ignoring {field} conversion to numeric.")
+            continue 
+        newfield = field.replace('_BOOL', '_NUM')
+        mask = df[field].notna()
+        df.loc[mask, newfield] = df.loc[mask][field].map({True: 1.0, False: 0.0})
+    return df.copy()
+
+def formatting_report_fields(df: pd.DataFrame) -> None:
+    basefields = sorted(list(set([col.replace('_CAT', '').replace('_BOOL', '').replace('_NUM', '') for col in df.columns])))
+
+    dtable_s = pd.DataFrame(data=False, index=basefields, columns=['CAT', 'NUM', 'BOOL'])
+    for field in basefields:
+        if f"{field}_CAT" in df.columns:
+            dtable_s.loc[field, 'CAT'] = True
+        if f"{field}_NUM" in df.columns:
+            dtable_s.loc[field, 'NUM'] = True
+        if f"{field}_BOOL" in df.columns:
+            dtable_s.loc[field, 'BOOL'] = True
+
+    print()
+    print(dtable_s)
 
 def format_local_ln_met(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -180,6 +523,16 @@ def cast_fibrosis_to_bool(text: str) -> bool:
 #################################
 ### NUMERIC -> CATEGORICAL ###
 #################################
+
+
+# def map_3cat_to_numeric(text: str) -> float:
+#     if 'low' in text:
+#         return 0.0
+#     elif 'mid' in text:
+#         return 1.0
+#     elif 'high' in text:
+#         return 2.0
+#     raise ValueError
 
 def cast_float_age_to_bins(age: float, binwidth: int=10) -> str:
     for i in range(0, 110, binwidth):
@@ -370,21 +723,5 @@ def subset_max_records_per_comparison(df: pd.DataFrame, max: int=5000, bool_pred
     return merged.copy()
 
 
-#############
-### STATS ###
-#############
-
-def relrisk(df: pd.DataFrame, grouping: str|None, predictor: str, response: str, baseval: str, banned: list[str]|None=None) -> pd.DataFrame:
-    counts = df.groupby([grouping, predictor])[response].value_counts().unstack().fillna(0).astype(int).reset_index()
-    counts.columns = [str(x) for x in counts.columns]
-    if banned is not None:
-        counts = counts[~counts[predictor].isin(banned)]
-    counts['prop'] = counts['True'] / (counts['True']+counts['False']) * 100
-    baseline_cases = counts[counts[predictor]==baseval].set_index(grouping)['True'].to_dict()
-    baseline_props = counts[counts[predictor]==baseval].set_index(grouping)['prop'].to_dict()
-    counts['norm'] = counts['prop'] / counts[grouping].map(baseline_props)
-    valid = set([k for k, v in baseline_cases.items() if v>=5])
-    counts = counts[counts[grouping].isin(valid)]
-    return counts 
 
 

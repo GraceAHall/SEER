@@ -1,5 +1,26 @@
 
-https://www.youtube.com/watch?v=NW28tkp6TZk
+TODO 
+- use sklearn feature selection to prune? 
+  https://scikit-learn.org/stable/modules/feature_selection.html
+
+
+Figure 1
+- Change colors Panel B 
+- Try grouping brain preference & Panel B together
+
+Figure 2
+- Panel A: Two rows (1=Logistic Regression, 2=Random Forest)
+- Panel B: Forest plot LR coefficients 
+
+Figure 3
+- Panel A: lineplots or something
+- Panel B: break breast into HER/ER +- subtypes 
+
+Figure 4
+- Panel A: forest plot odds ratios or current figure 2 panel A 
+- Panel B: calculate expected brain met rate for prostate adjusted up to Lung levels. 
+
+
 
 ------------------
 ---- FIGURE 1 ----
@@ -15,6 +36,8 @@ TODO
 ---- FIGURE 2 ----
 ------------------
 
+Cancer groups / hist types with similar behaviour
+
 Details
 - Cancer groups / hist types with similar behaviour
 - Behaviour: General metastasis risk, brain metastasis risk, <-diff
@@ -27,32 +50,31 @@ TODO
 ---- FIGURE 3 ----
 ------------------
 
-Details
-- ML models, performance metrics, key insights
-- Models
-    - Decision Tree
-    - Linear model 
-    - Association Rule Learning
-    - Neural Network
-    - Naive Bayes (optional)
+Important features per individual cancer group
 
-TODO
-- Categorical <-> discrete <-> continuous variable conversion
-- Pan-cancer model 
-- Individual models per cancer group   
+response=brain_met_BOOL
+    - Panel A: Heatmap universal predictors (Logistic Regression)
+    - Panel B: Heatmap universal predictors (Decision Tree)
+    - Panel C: Table of model performance (precision, recall, AUPRC?)
+    - Panel D: Nomagram for clinical use?
+
+response=any_met_BOOL
+    - as above 
+    - don't include distant_ln_met in any_met
 
 ------------------
 ---- FIGURE 4 ----
 ------------------
 
-Details
-- Nomagram
-- Panel A: Summary of findings (high risk individual and multivariate features) 
-- Panel B: Pruned decision tree for clinical use.
+Pan-cancer model and proportion of explained difference in brain met prevalence
 
-TODO 
-- use sklearn feature selection to prune? 
-  https://scikit-learn.org/stable/modules/feature_selection.html
+- Pan-cancer model: run again, preserving 
+    - RELATIVE cancer group BM/noBM ratios 
+    - while reducing number of noBM cases. 
+
+
+
+
 
 ------------------
 ---- FIGURE 5 ----
